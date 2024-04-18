@@ -372,6 +372,7 @@ export default {
         ).then((res) => {
           if (res.code == 200) {
             this.featureSelectTree = res.data;
+            console.log("featureSelectTree:", this.featureSelectTree);
             //获取dependent_variables
             if (this.m_all_featrues.length == 0) {
               this.featureSelectTree.forEach((root) => {
@@ -380,6 +381,7 @@ export default {
             } else {
               this.all_features = this.m_all_featrues;
             }
+            console.log("all_features:", this.all_features);
             this.checked_dependent_variables = this.m_target_feature;
             this.checked_independent_variables = this.m_use_features;
             this.know_variables = this.m_known_features;

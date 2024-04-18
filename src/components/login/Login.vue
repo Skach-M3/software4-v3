@@ -169,7 +169,6 @@ export default {
                 sessionStorage.setItem("userrole", resp.data.role);
                 this.$router.push("/sideBar/SoftwareIntro");
                 this.getTaskList();
-                this.getTreeData();
                 this.$message.success("登录成功");
               }
             } else {

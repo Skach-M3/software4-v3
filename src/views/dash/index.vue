@@ -85,7 +85,7 @@
       </el-card>
     </div>
 
-    <div class="bottomStatistic">
+    <!-- <div class="bottomStatistic">
       <el-card class="bottom_statistic_card">
         <div slot="header" class="clearfix">
           <span class="lineStyle">▍</span><span>正负样本占比</span>
@@ -93,11 +93,10 @@
         <div id="chartBox">
           <Bar  v-if="this.bar_x.length !==0 && this.bar_pos.length!==0 && this.bar_neg.length!=0" style="height: 400px;width: 1400px;" :bar_x="bar_x" :bar_neg="bar_neg" :bar_pos="bar_pos">
           </Bar>
-          <!-- <Bar style="height: 400px;width: 1400px;" :bar_x="bar_x" :bar_neg="bar_neg" :bar_pos="bar_pos">
-          </Bar> -->
+ 
         </div>
       </el-card>
-    </div>
+    </div> -->
 
   </div>
 </template>
@@ -291,22 +290,22 @@ export default {
           }
         }
       );
-      getRequest("stastic/get_pos_neg").then(
-        (res) => {
-          if (res.code == 200) {
-              this.bar_x=Object.keys(res.data);
-              let array = Object.values(res.data);
-              for (let index = 0; index < array.length; index++) {
-                  const element = array[index];
-                  this.bar_neg.push(element.neg);
-                  this.bar_pos.push(element.pos);
-              }
-          }
-          else {
-            this.$message.error("获取数据失败");
-          }
-        }
-      );
+      // getRequest("stastic/get_pos_neg").then(
+      //   (res) => {
+      //     if (res.code == 200) {
+      //         this.bar_x=Object.keys(res.data);
+      //         let array = Object.values(res.data);
+      //         for (let index = 0; index < array.length; index++) {
+      //             const element = array[index];
+      //             this.bar_neg.push(element.neg);
+      //             this.bar_pos.push(element.pos);
+      //         }
+      //     }
+      //     else {
+      //       this.$message.error("获取数据失败");
+      //     }
+      //   }
+      // );
     },
     table_val_change(){
       this.fill_rate_loading=true;

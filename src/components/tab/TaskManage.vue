@@ -179,11 +179,13 @@ export default {
   computed: {
     ...mapState(["taskList"]),
     ...mapGetters(["taskLeaderList", "taskDiseaseList"]),
+    loginUserID() {
+      return sessionStorage.getItem("userid");
+    },
   },
   created() {
     this.getCatgory();
     this.getTaskList();
-    this.getTreeData();
     this.pagehelper();
   },
   data() {
@@ -297,11 +299,11 @@ export default {
       });
     },
     getCatgory() {
-      getCategory("/api/category").then((response) => {
+      getCategory("/api/Taskcategory").then((response) => {
         this.treeData = response.data;
         // 获取病种和数据集总数
         this.diseaseNum =
-          response.data[0].children.length + response.data[1].children.length;
+          response.data[0].children.length;
         getRequest("/api/getTableNumber").then((res) => {
           if (res.code == 200) this.datasetNum = res.data;
         });

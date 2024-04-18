@@ -8,25 +8,12 @@
           <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
         </div>
         <hr class="hr-dashed" />
-        <el-tree
-          ref="tree"
-          :data="treeData"
-          :show-checkbox="false"
-          node-key="id"
-          default-expand-all
-          :expand-on-click-node="false"
-          :check-on-click-node="true"
-          :highlight-current="true"
-          @node-click="changeData"
-          @check="changeData"
-          @check-change="handleCheckChange"
-        >
+        <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+          @check="changeData" @check-change="handleCheckChange">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span
-              v-if="data.catLevel == 1"
-              style="font-weight: bold; font-size: 15px; color: #252525"
-              >{{ node.label }}</span
-            >
+            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+              }}</span>
             <span v-else>{{ node.label }}</span>
           </span>
         </el-tree>
@@ -38,60 +25,36 @@
           </div>
           <div class="describe_content">
             <p>
-              <i class="el-icon-folder"></i> 数据集名称:<span
-                style="font-weight: bold; font-size: 18px; color: #252525"
-                >{{ showDataForm.tablename }}</span
-              >
+              <i class="el-icon-folder"></i> 数据集名称:<span style="font-weight: bold; font-size: 18px; color: #252525">{{
+            showDataForm.tablename }}</span>
               <i class="el-icon-user"></i> 创建人:<span>{{
-                showDataForm.createUser
-              }}</span>
+            showDataForm.createUser
+          }}</span>
               <i class="el-icon-time"></i> 创建时间:<span>{{
-                showDataForm.createTime
-              }}</span>
+              showDataForm.createTime
+            }}</span>
               <i class="el-icon-finished"></i> 样本个数:<span>{{
-                showDataForm.sampleNum
-              }}</span>
+              showDataForm.sampleNum
+            }}</span>
               <i class="el-icon-finished"></i> 特征个数:<span>{{
-                showDataForm.featureNum
-              }}</span>
-              <!-- <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span> -->
+              showDataForm.featureNum
+            }}</span>
+              <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span>
             </p>
           </div>
 
-          <div
-            class="tableDataCSS"
-            v-loading="table_loading"
-            element-loading-text="数据量较大，拼命加载中"
-            element-loading-spinner="el-icon-loading"
-            element-loading-background="rgba(0, 0, 0, 0.05)"
-            ref="listWrap"
-            @scroll="scrollListener"
-          >
-            <div
-              class="tablePlaceholder"
-              v-if="tableData.length < 1 && !table_loading"
-            >
+          <div class="tableDataCSS" v-loading="table_loading" element-loading-text="数据量较大，拼命加载中"
+            element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.05)" ref="listWrap"
+            @scroll="scrollListener">
+            <div class="tablePlaceholder" v-if="tableData.length < 1 && !table_loading">
               请在左侧选择数据
             </div>
             <div v-else ref="list">
-              <el-table
-                :data="tableData"
-                stripe
-                class="custom-table"
-                max-height="550"
-                :fit="false"
-                v-if="tableData.length > 0"
-                :header-cell-style="{ background: '#eee', color: '#606266' }"
-                ref="scrollTable"
-              >
-                <el-table-column
-                  v-for="(value, key) in tableData[0]"
-                  :key="key"
-                  :prop="key"
-                  :label="key"
-                  :width="colWidth"
-                  sortable
-                >
+              <el-table :data="tableData" stripe class="custom-table" max-height="550" :fit="false"
+                v-if="tableData.length > 0" :header-cell-style="{ background: '#eee', color: '#606266' }"
+                ref="scrollTable">
+                <el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key"
+                  :width="colWidth" sortable>
                   <template slot-scope="{ row }">
                     <div class="truncate-text">{{ row[key] }}</div>
                   </template>
@@ -103,13 +66,8 @@
 
         <div class="buttonGroup">
           <el-button @click="backStep()" round>上一步</el-button>
-          <el-button
-            type="primary"
-            round
-            :disabled="tableData.length < 1"
-            @click="next(showDataForm.classPath, showDataForm.tablename)"
-            >下一步</el-button
-          >
+          <el-button type="primary" round :disabled="tableData.length < 1"
+            @click="next(showDataForm.classPath, showDataForm.tablename)">下一步</el-button>
         </div>
       </div>
     </div>
@@ -143,6 +101,9 @@ export default {
     },
     length() {
       return this.tableData.length || 0;
+    },
+    loginUserID() {
+      return sessionStorage.getItem("userid");
     },
   },
 
@@ -207,22 +168,22 @@ export default {
       this.start = Math.floor(scrollTop / this.itemHeight);
       // 结束索引
       this.end = this.start + this.num;
-      this.$refs.list.style.transform = `translateY(${
-        this.start * this.itemHeight
-      }px)`; // 对列表项y轴偏移
+      this.$refs.list.style.transform = `translateY(${this.start * this.itemHeight
+        }px)`; // 对列表项y轴偏移
     },
     next(classPath, name) {
-      let path = classPath.split("/");
-      if (path[0] != "公共数据集") {
+      var path = classPath.split("/");
+      console.log(this.tempNode);
+      if (this.tempNode.isFilter == "1") {
         this.m_changeTaskInfo({
           disease: path[0],
           dataset: name,
           is_common: false,
           node_data: JSON.stringify(this.tempNode),
         });
-      } else {
+      } else if (this.tempNode.isUpload == "1") {
         this.m_changeTaskInfo({
-          disease: path[path.length - 1],
+          disease: path[0],
           dataset: name,
           is_common: true,
           node_data: JSON.stringify(this.tempNode),
@@ -287,11 +248,11 @@ export default {
     },
 
     getCatgory() {
-      getCategory("/api/category").then((response) => {
+      getCategory(`/api/category?uid=${this.loginUserID}`).then((response) => {
         console.log(response.data);
         // 如果是多疾病任务，只能选择公共数据集
         if (this.moduleName == "factorDis") {
-          const tempData = this.filterCommonAndMutiData(response.data);
+          const tempData = this.filterTreeByLabel(response.data,'多疾病');
           // console.log(tempData);
           this.treeData = tempData;
           // 为什么find不能用
@@ -333,15 +294,49 @@ export default {
         return false;
       });
     },
+    filterTreeByLabel(tree, label) {
+    // 创建一个新数组，存储匹配标签的节点及其子树
+    const result = [];
 
-    filterCommonAndMutiData(data) {
-      // 过滤出"公共数据集下的多疾病"
-      const publicDatasets = data.filter((item) => item.id === "1010");
-      const publicDatasets2 = publicDatasets[0].children.filter(
-        (item) => item.id == "1775096840182611969"
-      );
-      return this.filterTree(publicDatasets2);
-    },
+    // 递归函数来检查每个节点及其子树
+    function checkNode(node) {
+        // 判断节点的标签是否为指定的label
+        if (node.label === label) {
+            // 如果是则包括这个节点及其全部子树
+            return true;
+        }
+        // 如果有子节点，继续在它们中寻找
+        if (node.children && node.children.length > 0) {
+            // 新的子节点数组
+            const newChildren = [];
+            for (let child of node.children) {
+                // 递归每个子节点
+                if (checkNode(child)) {
+                    // 如果子节点或其任一子树匹配，则保留该子节点
+                    newChildren.push(child);
+                }
+            }
+            // 如果找到了匹配的子节点，则重构当前节点并保留符合条件的子节点
+            if (newChildren.length > 0) {
+                node.children = newChildren;
+                return true;
+            }
+        }
+        // 如果当前节点和它的子节点都不匹配，则返回false
+        return false;
+    }
+
+    // 遍历树的顶层节点
+    tree.forEach(node => {
+        if (checkNode(node)) {
+            // 如果节点或其子树匹配，则添加到最终结果中
+            result.push(node);
+        }
+    });
+    // 返回匹配的节点及其所有子节点
+    return result;
+}
+
   },
 };
 </script>
@@ -374,10 +369,12 @@ export default {
   height: 50px;
   text-align: center;
 }
+
 .tipInfo .statistic {
   font-size: 13px;
   color: #585858;
 }
+
 .hr-dashed {
   border: 0;
   border-top: 1px dashed #899bbb;
@@ -433,7 +430,7 @@ h3 {
 
 .describe_content {
   display: inline-block;
-  width: 70%;
+  width: 90%;
   margin-bottom: 26px;
 }
 

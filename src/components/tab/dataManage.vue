@@ -1,114 +1,42 @@
 <template>
   <div class="content">
     <div class="left_tree">
-      <!-- <el-button type="success" class="add_button" @click="dialogDiseaseVisible2 = true">添加病种</el-button> -->
-      <!-- <el-dialog title="提示" :visible.sync="dialogDiseaseVisible2" width="30%">
-        <span>
-          请输入新病种名称：<el-input placeholder="请输入内容" v-model="diseaseName" class="nameInput"></el-input>
-        </span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="cleanInput()">取 消</el-button>
-          <el-button type="primary" @click="addDisease()">确 定</el-button>
-        </span>
-      </el-dialog> -->
       <div class="tipInfo">
         <h3>可选数据</h3>
         <span class="statistic"> 一级病种: {{ diseaseNum }} 个 </span>
         <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
       </div>
       <hr class="hr-dashed" />
-      <el-tree
-        ref="tree"
-        :data="treeData"
-        :show-checkbox="false"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-        :check-on-click-node="true"
-        :highlight-current="true"
-        @node-click="changeData"
-        @check-change="handleCheckChange"
-      >
+      <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+        :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+        @check-change="handleCheckChange">
         <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span
-            v-if="data.catLevel == 1"
-            style="font-weight: bold; font-size: 15px; color: #252525"
-            >{{ node.label }}</span
-          >
+          <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+            }}</span>
           <span v-else>{{ node.label }}</span>
           <span>
-            <!--公共数据集confirm-->
-            <el-popconfirm
-              v-if="data.isCommon"
-              confirm-button-text="新病种"
-              cancel-button-text="数据集"
-              title="请选择添加的文件"
-              cancel-button-type="primary"
-              @confirm="dialogDiseaseVisible = true"
-              @cancel="importData"
-            >
-              <el-button
-                v-if="!data.isLeafs"
-                icon="el-icon-circle-plus-outline"
-                size="mini"
-                type="text"
-                slot="reference"
-                @click="markNode(data)"
-              >
-              </el-button>
-            </el-popconfirm>
-            <!--非公共数据集confirm-->
-            <el-popconfirm
-              v-else
-              confirm-button-text="新病种"
-              cancel-button-text="数据集"
-              title="请选择添加的文件"
-              cancel-button-type="primary"
-              @confirm="dialogDiseaseVisible = true"
-              @cancel="openAddDataForm(data.path)"
-            >
-              <el-button
-                v-if="!data.isLeafs"
-                icon="el-icon-circle-plus-outline"
-                size="mini"
-                type="text"
-                slot="reference"
-                @click="markNode(data)"
-              >
+            <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
+              cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
+              <el-button v-if="data.catLevel == 3 && data.status != 2" icon="el-icon-circle-plus-outline" size="mini"
+                type="text" slot="reference" @click="markNode(data)">
               </el-button>
             </el-popconfirm>
 
-            <el-popconfirm
-              title="删除后无法恢复"
-              icon="el-icon-warning"
-              icon-color="red"
-              confirm-button-text="确认"
-              cancel-button-text="取消"
-              @confirm="() => remove(node, data)"
-            >
-              <el-button
-                v-if="
-                  data.id != '1775096840182611969' &&
-                  data.id != '1010' &&
-                  data.id != '1'
-                "
-                icon="el-icon-delete"
-                size="mini"
-                type="text"
-                slot="reference"
-              >
+            <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
+              cancel-button-text="取消" @confirm="() => remove(node, data)">
+              <el-button v-if="(data.isLeafs == 1 &&
+          data.status == 0) ||
+          (data.uid == loginUserID && data.status != 2)
+          " icon="el-icon-delete" size="mini" type="text" slot="reference">
               </el-button>
             </el-popconfirm>
+
           </span>
         </span>
       </el-tree>
       <el-dialog title="提示" :visible.sync="dialogDiseaseVisible" width="30%">
         <span>
-          请输入新病种名称：<el-input
-            placeholder="请输入内容"
-            v-model="diseaseName"
-            class="nameInput"
-          ></el-input>
+          请输入新病种名称：<el-input placeholder="请输入内容" v-model="diseaseName" class="nameInput"></el-input>
         </span>
         <span slot="footer" class="dialog-footer">
           <el-button @click="cleanInput()">取 消</el-button>
@@ -116,28 +44,17 @@
         </span>
       </el-dialog>
     </div>
-    <el-dialog
-      title="新增数据集"
-      :visible.sync="dialogDataVisible"
-      width="1150px"
-    >
+    <el-dialog title="新增数据集" :visible.sync="dialogDataVisible" width="1150px">
       <div class="addDataClass">
         <div class="addDataBaseInfo">
           <i class="el-icon-s-data"></i>
           <span class="titleText">数据集：</span>
-          <el-input
-            v-model="addDataForm.dataName"
-            placeholder="请输入数据集名称"
-          ></el-input>
+          <el-input v-model="addDataForm.dataName" placeholder="请输入数据集名称"></el-input>
         </div>
         <div class="addDataBaseInfo">
           <i class="el-icon-user-solid"></i>
           <span class="titleText">创建人：</span>
-          <el-input
-            v-model="addDataForm.createUser"
-            placeholder="请输入创建人姓名"
-            disabled
-          ></el-input>
+          <el-input v-model="addDataForm.createUser" placeholder="请输入创建人姓名" disabled></el-input>
         </div>
         <div class="addDataBaseInfo createTimeArea">
           <i class="el-icon-time"></i>
@@ -155,166 +72,79 @@
           <i class="el-icon-connection"></i>&nbsp;&nbsp;特征选择
         </div>
         <div style="margin-top: 20px">
-          <el-button
-            type="primary"
-            plain
-            icon="el-icon-plus"
-            style="margin-right: 8px"
-            @click="putToAddDataForm"
-            >添加新条件</el-button
-          >
-          <el-button
-            @click="chooseCharacter(addDataForm.characterList[0])"
-            style="margin-right: 8px; margin-left: 0px"
-            >{{ addDataForm.characterList[0].button }}</el-button
-          >
+          <el-button type="primary" plain icon="el-icon-plus" style="margin-right: 8px"
+            @click="putToAddDataForm">添加新条件</el-button>
+          <el-button @click="chooseCharacter(addDataForm.characterList[0])"
+            style="margin-right: 8px; margin-left: 0px">{{ addDataForm.characterList[0].button }}</el-button>
           <span v-if="addDataForm.characterList[0].type === 'discrete'">
-            <el-select
-              :value="'='"
-              slot="prepend"
-              placeholder="运算符"
-              style="width: 90px; margin-right: 8px"
-              disabled
-            >
+            <el-select :value="'='" slot="prepend" placeholder="运算符" style="width: 90px; margin-right: 8px" disabled>
               <el-option label="=" value="="></el-option>
             </el-select>
-            <el-select
-              v-model="addDataForm.characterList[0].value"
-              placeholder="请选择特征取值"
-              style="width: 300px"
-            >
-              <el-option
-                v-for="item in addDataForm.characterList[0].range"
-                :key="item"
-                :label="item"
-                :value="item"
-              >
+            <el-select v-model="addDataForm.characterList[0].value" placeholder="请选择特征取值" style="width: 300px">
+              <el-option v-for="item in addDataForm.characterList[0].range" :key="item" :label="item" :value="item">
               </el-option>
             </el-select>
           </span>
           <span v-else>
-            <el-select
-              v-model="addDataForm.characterList[0].computeOpt"
-              slot="prepend"
-              placeholder="运算符"
-              style="width: 90px; margin-right: 8px"
-            >
+            <el-select v-model="addDataForm.characterList[0].computeOpt" slot="prepend" placeholder="运算符"
+              style="width: 90px; margin-right: 8px">
               <el-option label=">" value=">"></el-option>
               <el-option label="<" value="<"></el-option>
               <el-option label="=" value="="></el-option>
             </el-select>
-            <el-input
-              v-model="addDataForm.characterList[0].value"
-              placeholder="请输入特征取值"
-              style="width: 300px"
-            ></el-input>
+            <el-input v-model="addDataForm.characterList[0].value" placeholder="请输入特征取值"
+              style="width: 300px"></el-input>
             <span style="width: 200px; color: #858585">
-              单位：{{ addDataForm.characterList[0].unit }}</span
-            >
+              单位：{{ addDataForm.characterList[0].unit }}</span>
           </span>
         </div>
-        <div
-          style="margin-top: 20px"
-          v-for="(characterItem, index) in addDataForm.characterList.slice(1)"
-          :key="index"
-        >
-          <el-select
-            v-model="characterItem.opt"
-            slot="prepend"
-            placeholder="条件选择"
-            style="width: 130px; margin-right: 8px"
-          >
+        <div style="margin-top: 20px" v-for="(characterItem, index) in addDataForm.characterList.slice(1)" :key="index">
+          <el-select v-model="characterItem.opt" slot="prepend" placeholder="条件选择"
+            style="width: 130px; margin-right: 8px">
             <el-option label="AND" value="0"></el-option>
             <el-option label="OR" value="1"></el-option>
             <el-option label="NOT" value="2"></el-option>
           </el-select>
-          <el-button
-            @click="chooseCharacter(characterItem)"
-            style="width: 130px; margin-right: 8px"
-            >{{ characterItem.button }}</el-button
-          >
+          <el-button @click="chooseCharacter(characterItem)" style="width: 130px; margin-right: 8px">{{
+          characterItem.button }}</el-button>
           <span v-if="characterItem.type === 'discrete'">
-            <el-select
-              :value="'='"
-              slot="prepend"
-              placeholder="运算符"
-              style="width: 90px; margin-right: 8px"
-              disabled
-            >
+            <el-select :value="'='" slot="prepend" placeholder="运算符" style="width: 90px; margin-right: 8px" disabled>
               <el-option label="=" value="="></el-option>
             </el-select>
-            <el-select
-              v-model="characterItem.value"
-              placeholder="请选择特征取值"
-              style="width: 300px"
-            >
-              <el-option
-                v-for="item in characterItem.range"
-                :key="item"
-                :label="item"
-                :value="item"
-              >
+            <el-select v-model="characterItem.value" placeholder="请选择特征取值" style="width: 300px">
+              <el-option v-for="item in characterItem.range" :key="item" :label="item" :value="item">
               </el-option>
             </el-select>
           </span>
           <span v-else>
-            <el-select
-              v-model="characterItem.computeOpt"
-              slot="prepend"
-              placeholder="运算符"
-              style="width: 90px; margin-right: 8px"
-            >
+            <el-select v-model="characterItem.computeOpt" slot="prepend" placeholder="运算符"
+              style="width: 90px; margin-right: 8px">
               <el-option label=">" value=">"></el-option>
               <el-option label="<" value="<"></el-option>
               <el-option label="=" value="="></el-option>
             </el-select>
-            <el-input
-              v-model="characterItem.value"
-              placeholder="请输入特征取值"
-              style="width: 300px"
-            ></el-input>
+            <el-input v-model="characterItem.value" placeholder="请输入特征取值" style="width: 300px"></el-input>
             <span style="width: 200px; color: #858585">
-              单位：{{ characterItem.unit }}</span
-            >
+              单位：{{ characterItem.unit }}</span>
           </span>
-          <el-button
-            type="primary"
-            plain
-            icon="el-icon-delete"
-            style="margin-left: 10px"
-            @click="deleteToAddDataForm(characterItem)"
-            >删除</el-button
-          >
+          <el-button type="primary" plain icon="el-icon-delete" style="margin-left: 10px"
+            @click="deleteToAddDataForm(characterItem)">删除</el-button>
         </div>
-        <div
-          style="
+        <div style="
             margin-top: 20px;
             margin-bottom: 10px;
             display: flex;
             justify-content: center;
-          "
-        >
+          ">
           <button class="cool-button" @click="submitCharacterCondition">
             筛选病例
           </button>
         </div>
         <!-- 显示筛选出来的表数据 -->
-        <el-table
-          :data="addTableData"
-          stripe
-          style="width: 100%"
-          height="450"
-          v-show="showAddTableData"
-          :header-cell-style="{ background: '#eee', color: '#606266' }"
-        >
-          <el-table-column
-            v-for="(value, key) in addTableData[0]"
-            :key="key"
-            :prop="key"
-            :label="key"
-            width="80"
-            sortable
-          >
+        <el-table :data="addTableData" stripe style="width: 100%" height="450" v-show="showAddTableData"
+          :header-cell-style="{ background: '#eee', color: '#606266' }">
+          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
+            sortable>
             <template slot-scope="{ row }">
               <div class="truncate-text">{{ row[key] }}</div>
             </template>
@@ -326,12 +156,7 @@
         <el-button @click="cleanDataInput()">取 消</el-button>
         <el-button type="primary" @click="addTable()">新建表</el-button>
       </span>
-      <el-dialog
-        title="特征选择"
-        :visible.sync="characterVisible"
-        width="50%"
-        append-to-body
-      >
+      <el-dialog title="特征选择" :visible.sync="characterVisible" width="50%" append-to-body>
         <el-container>
           <el-aside width="180px">
             <el-menu default-active="1" class="el-menu-vertical-demo">
@@ -348,127 +173,60 @@
           </el-aside>
           <el-main>
             <el-radio-group v-model="characterId" class="charactersGroup">
-              <el-radio
-                v-for="optItem in characterOptList"
-                :key="optItem.characterId"
-                :label="optItem.characterId"
-                border
-                style="
+              <el-radio v-for="optItem in characterOptList" :key="optItem.characterId" :label="optItem.characterId"
+                border style="
                   margin-bottom: 10px;
                   margin-left: 0px;
                   margin-right: 10px;
-                "
-                >{{ optItem.chName }}</el-radio
-              >
+                ">{{ optItem.chName }}</el-radio>
             </el-radio-group>
           </el-main>
         </el-container>
         <span slot="footer" class="dialog-footer">
-          <el-button type="primary" @click="confirmCharacter()"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="confirmCharacter()">确 定</el-button>
         </span>
       </el-dialog>
     </el-dialog>
     <!--===============================     导入数据表单   ===================================================================-->
-    <el-dialog
-      v-loading="loading"
-      :element-loading-text="loadText"
-      id="importDataTable"
-      title="导入数据表"
-      :visible.sync="dialogFormVisible"
-      width="40%"
-    >
-      <el-form
-        :model="dialogForm"
-        ref="dialogFormRef"
-        :rules="dialogForm.rules"
-        label-width="110px"
-      >
+    <el-dialog v-loading="loading" :element-loading-text="loadText" id="importDataTable" title="导入数据表"
+      :visible.sync="dialogFormVisible" width="40%">
+      <el-form :model="dialogForm" ref="dialogFormRef" :rules="dialogForm.rules" label-width="110px">
         <el-form-item label="选择数据表" prop="filesInfo">
-          <el-upload
-            action=""
-            class="upload"
-            ref="uploadRef"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            :on-change="changeFile"
-            :auto-upload="false"
-            accept=".csv"
-            :limit="1"
-            :multiple="false"
-            :file-list="dialogForm.filesInfo"
-            :http-request="
-              (data) => {
-                upRequest(data);
-              }
-            "
-          >
-            <el-button slot="trigger" size="small" type="success"
-              >选取文件</el-button
-            >
+          <el-upload action="" class="upload" ref="uploadRef" :on-preview="handlePreview" :on-remove="handleRemove"
+            :on-change="changeFile" :auto-upload="false" accept=".csv" :limit="1" :multiple="false"
+            :file-list="dialogForm.filesInfo" :http-request="(data) => {
+          upRequest(data);
+        }
+          ">
+            <el-button slot="trigger" size="small" type="success">选取文件</el-button>
             <div slot="tip" class="el-upload__tip">只能上传csv文件</div>
           </el-upload>
         </el-form-item>
 
         <el-form-item label="数据表名称" prop="tableName">
-          <el-input
-            v-model="dialogForm.tableName"
-            placeholder="请输入数据表名称"
-          ></el-input>
+          <el-input v-model="dialogForm.tableName" placeholder="请输入数据表名称"></el-input>
         </el-form-item>
         <el-form-item label="涉及疾病" prop="dataDisease">
-          <!-- <el-select v-model="dialogForm.dataDisease" filterable placeholder="请选择或搜索">
-            <el-option v-for="item in disOptions" :key="item.name" :label="item.name" :value="item.name">
-            </el-option>
-          </el-select> -->
-          <el-input
-            v-model="dialogForm.dataDisease"
-            :disabled="true"
-            style="width: 150px"
-          ></el-input>
+          <el-input v-model="dialogForm.dataDisease" :disabled="true" style="width: 150px"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button
-          @click="
-            dialogFormVisible = false;
-            resetForm('dialogFormRef');
-          "
-          >取消</el-button
-        >
+        <el-button @click="
+          dialogFormVisible = false;
+        resetForm('dialogFormRef');
+        ">取消</el-button>
         <el-button @click="resetForm('dialogFormRef')">重置</el-button>
         <el-button type="primary" @click="uploadFile">确定</el-button>
       </div>
 
       <!-- 解析表后字段分类弹窗 -->
-      <el-dialog
-        v-loading="loading2"
-        :element-loading-text="loadText2"
-        append-to-body
-        title="请选择多个疾病标签字段"
-        :visible.sync="featuresVision"
-      >
+      <el-dialog v-loading="loading2" :element-loading-text="loadText2" append-to-body title="请选择多个疾病标签字段"
+        :visible.sync="featuresVision">
         <!-- <el-form class="featureLabel" label-width="auto"> -->
         <el-checkbox-group v-model="labelList">
-          <el-checkbox
-            style="width: 250px"
-            border
-            v-for="(name, index) in Object.keys(featuresMap)"
-            :key="index"
-            :label="name"
-          ></el-checkbox>
+          <el-checkbox style="width: 250px" border v-for="(name, index) in Object.keys(featuresMap)" :key="index"
+            :label="name"></el-checkbox>
         </el-checkbox-group>
-        <!-- <el-form-item v-for="(name, index) in Object.keys(featuresMap)" :key="index" :label="name">
-            <el-select v-model="featuresMap[name]" placeholder="请选择特征类型" @change="changeLabel(name, featuresMap[name])">
-              <el-option label="诊断" value="diagnosis" key="diagnosis"></el-option>
-              <el-option label="检查" value="examine" key="examine"></el-option>
-              <el-option label="病理" value="pathology" key="pathology"></el-option>
-              <el-option label="生命特征" value="vital_signs" key="vital_signs"></el-option>
-              <el-option label="标签" value="label" key="label"></el-option>
-            </el-select>
-          </el-form-item> -->
-        <!-- </el-form> -->
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="compelete">完成上传</el-button>
         </div>
@@ -481,69 +239,42 @@
         </div>
         <div class="describe_content">
           <p style="margin-top: 0.5%; width: 100%">
-            <i class="el-icon-folder"></i> 数据集名称:<span
-              style="font-weight: bold; font-size: 18px; color: #252525"
-              >{{ showDataForm.tableName }}</span
-            >
+            <i class="el-icon-folder"></i> 数据集名称:<span style="font-weight: bold; font-size: 18px; color: #252525">{{
+          showDataForm.tableName }}</span>
             <i class="el-icon-user"></i> 创建人:<span>{{
-              showDataForm.createUser
-            }}</span>
+          showDataForm.createUser
+        }}</span>
             <i class="el-icon-time"></i> 创建时间:<span>{{
-              showDataForm.createTime
-            }}</span>
+            showDataForm.createTime
+          }}</span>
             <i class="el-icon-finished"></i> 样本个数:<span>{{
-              showDataForm.sampleNum
-            }}</span>
+            showDataForm.sampleNum
+          }}</span>
             <i class="el-icon-finished"></i> 特征个数:<span>{{
-              showDataForm.featureNum
-            }}</span>
-            <!-- <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span> -->
-            <el-button
-              type="primary"
-              @click="csvDialogVisible = true"
-              size="mini"
-              v-if="showDataForm.tableName"
-              class="csv_btn"
-              >导出数据</el-button
-            >
+            showDataForm.featureNum
+          }}</span>
+            <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span>
+            <el-button type="success" size="mini" class="change_btn"
+              v-if="nodeData.uid === loginUserID && nodeData.status == '0'" @click="changeStatus()">转为共享</el-button>
+            <el-button type="success" size="mini" class="change_btn"
+              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeStatus()">转为私有</el-button>
+            <el-button type="primary" @click="csvDialogVisible = true" size="mini" v-if="showDataForm.tableName"
+              class="csv_btn">导出数据</el-button>
           </p>
         </div>
         <!-- 显示表数据 -->
 
-        <div
-          class="tableDataCSS"
-          v-loading="table_loading"
-          element-loading-text="数据量较大，拼命加载中"
-          element-loading-spinner="el-icon-loading"
-          element-loading-background="rgba(0, 0, 0, 0.05)"
-          ref="listWrap"
-          @scroll="scrollListener"
-        >
-          <div
-            class="tablePlaceholder"
-            v-if="tableData.length < 1 && !table_loading"
-          >
+        <div class="tableDataCSS" v-loading="table_loading" element-loading-text="数据量较大，拼命加载中"
+          element-loading-spinner="el-icon-loading" element-loading-background="rgba(0, 0, 0, 0.05)" ref="listWrap"
+          @scroll="scrollListener">
+          <div class="tablePlaceholder" v-if="tableData.length < 1 && !table_loading">
             请在左侧选择数据
           </div>
           <div ref="list">
-            <el-table
-              v-if="tableData.length > 0"
-              :data="tableData"
-              stripe
-              style="width: 100%"
-              class="custom-table"
-              max-height="720"
-              ref="scrollTable"
-              :header-cell-style="{ background: '#eee', color: '#606266' }"
-            >
-              <el-table-column
-                v-for="(value, key) in tableData[0]"
-                :key="key"
-                :prop="key"
-                :label="key"
-                :width="colWidth"
-                sortable
-              >
+            <el-table v-if="tableData.length > 0" :data="tableData" stripe style="width: 100%" class="custom-table"
+              max-height="720" ref="scrollTable" :header-cell-style="{ background: '#eee', color: '#606266' }">
+              <el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key"
+                :width="colWidth" sortable>
                 <template slot-scope="{ row }">
                   <div class="truncate-text">{{ row[key] }}</div>
                 </template>
@@ -553,29 +284,19 @@
         </div>
       </el-card>
 
-      <el-dialog
-        title="请选择要导出的字段"
-        :visible.sync="csvDialogVisible"
-        width="60%"
-        :before-close="handleCloseCSV"
-      >
+      <el-dialog title="请选择要导出的字段" :visible.sync="csvDialogVisible" width="60%" :before-close="handleCloseCSV">
         <div class="selectFeatrueDescribe" style="background-color: #f5f7fa">
           <i class="el-icon-s-help"></i> 字段个数:<span>{{
-            fields.length
-          }}</span>
+          fields.length
+        }}</span>
           <i class="el-icon-finished" style="margin-left: 50%"></i>
           已选字段个数:<span>{{ selectedFields.length }}</span>
         </div>
         <el-divider></el-divider>
         <el-checkbox v-model="selectAll" @change="handleSelectAll" /> 全选
         <el-checkbox-group v-model="selectedFields">
-          <el-checkbox
-            style="width: 150px"
-            v-for="field in fields"
-            :key="field"
-            :label="field"
-            >{{ field }}</el-checkbox
-          >
+          <el-checkbox style="width: 150px" v-for="field in fields" :key="field" :label="field">{{ field
+            }}</el-checkbox>
         </el-checkbox-group>
         <span slot="footer" class="dialog-footer">
           <el-button @click="handleCloseCSV">取 消</el-button>
@@ -631,9 +352,9 @@ export default {
     "addDataForm.dataName"() {
       this.checkAddTaleName();
     },
-    diseaseName() {
-      this.checkDiseasename();
-    },
+    // diseaseName() {
+    //   this.checkDiseasename();
+    // },
     selectedFields(newValue) {
       // 如果一键全选框被取消选中，且 selectedFeatures 的长度大于 0，则将其置为 false
       this.selectAll = newValue.length === this.fields.length;
@@ -713,7 +434,6 @@ export default {
       nodeData: {},
 
       diseaseName: "",
-      checkIsCommon: "",
       diseaseNameisOnly: true,
       loading: false,
       loading2: false,
@@ -774,61 +494,6 @@ export default {
   },
 
   created() {
-    // 检查重名的防抖函数
-    this.checkDiseasename = this.debounce(() => {
-      this.diseaseNameisOnly = true;
-      if (this.checkIsCommon == "0") {
-        getRequest("/api/inspectionOfIsNotCommon", {
-          newname: this.diseaseName,
-        }).then((res) => {
-          // 上一次重复了这一次不重复就要提醒一下
-          if (!this.diseaseNameisOnly) {
-            this.$message({
-              showClose: true,
-              message: "疾病名称可用",
-              type: "success",
-            });
-          }
-          if (typeof res.data === "boolean") {
-            this.diseaseNameisOnly = res.data;
-          }
-          if (!res.data) {
-            this.$message({
-              showClose: true,
-              message: "疾病名称重名，请重新填写",
-              type: "warning",
-            });
-            return false;
-          }
-          return true;
-        });
-      } else if (this.checkIsCommon == "1") {
-        getRequest("/api/inspectionOfIsCommon", {
-          newname: this.diseaseName,
-        }).then((res) => {
-          // 上一次重复了这一次不重复就要提醒一下
-          if (this.diseaseNameisOnly) {
-            this.$message({
-              showClose: true,
-              message: "疾病名称可用",
-              type: "success",
-            });
-          }
-          if (typeof res.data === "boolean") {
-            this.diseaseNameisOnly = res.data;
-          }
-          if (!res.data) {
-            this.$message({
-              showClose: true,
-              message: "疾病名称重名，请重新填写",
-              type: "warning",
-            });
-            return false;
-          }
-          return true;
-        });
-      }
-    }, 200);
     this.checkTableName = this.debounce(() => {
       getRequest("/api/DataTable/inspection", {
         newname: this.dialogForm.tableName,
@@ -894,9 +559,8 @@ export default {
       this.start = Math.floor(scrollTop / this.itemHeight);
       // 结束索引
       this.end = this.start + this.num;
-      this.$refs.list.style.transform = `translateY(${
-        this.start * this.itemHeight
-      }px)`; // 对列表项y轴偏移
+      this.$refs.list.style.transform = `translateY(${this.start * this.itemHeight
+        }px)`; // 对列表项y轴偏移
     },
     handleSelectAll() {
       if (this.selectAll) {
@@ -962,6 +626,8 @@ export default {
       }
       return value;
     },
+
+    //多标签上传
     compelete() {
       // 判断多标签合理性，并填写上传payload
       let labelCount = 0;
@@ -1008,6 +674,8 @@ export default {
         }
       });
     },
+
+
     changeLabel(name, label) {
       console.log("name: ");
       console.log(name);
@@ -1017,6 +685,7 @@ export default {
 
       this.featuresMap[name] = label;
     },
+
     confirmCharacter() {
       this.characterVisible = false;
       let index = this.addDataForm.characterList.indexOf(this.characterOptItem);
@@ -1044,13 +713,18 @@ export default {
     upRequest(data) {
       console.log("开始上传文件");
       const payload = new FormData();
+
       payload.append("file", data.file);
       payload.append("newName", this.dialogForm.tableName);
       payload.append("disease", this.dialogForm.dataDisease);
       payload.append("user", sessionStorage.getItem("username"));
       payload.append("uid", sessionStorage.getItem("userid") - 0);
       payload.append("parentId", this.nodeData.id);
-      payload.append("parentType", this.nodeData.path);
+      payload.append("parentType", this.nodeData.label);
+      payload.append("status", this.nodeData.status);
+      payload.append("size", this.$refs["uploadRef"].uploadFiles[0].size / 100000);
+      payload.append("is_upload","1");
+      payload.append("is_filter","0");
       this.options = {
         method: "post",
         data: payload,
@@ -1060,8 +734,8 @@ export default {
         },
       };
       // 多疾病下的上传文件需要打标签，用不同的接口
-      let paths = this.nodeData.path.split("/");
-      if (paths[1] === "多疾病") {
+      let paths = this.nodeData.label;
+      if (paths === "多疾病") {
         this.options.url = "api/dataTable/parseAndUpload";
       }
 
@@ -1076,11 +750,11 @@ export default {
             message: "解析成功",
           });
           let featureList = res.data;
-          // 把特征存为map的键
+          //把特征存为map的键
           for (const item of featureList) {
             this.$set(this.featuresMap, item, "diagnosis");
           }
-          if (paths[1] === "多疾病") {
+          if (paths === "多疾病") {
             this.featuresVision = true;
           }
           this.dialogFormVisible = false;
@@ -1093,9 +767,12 @@ export default {
           });
         }
       });
+
+
     },
     getCatgory() {
-      getCategory("/api/category").then((response) => {
+
+      getCategory(`/api/category?uid=${this.loginUserID}`).then((response) => {
         this.treeData = response.data;
         // 获取病种和数据集总数
         this.diseaseNum =
@@ -1106,7 +783,6 @@ export default {
       });
     },
     uploadFile() {
-      console.log("开始上传文件");
       if (this.$refs["uploadRef"].uploadFiles.length < 1) {
         this.$message({
           showClose: true,
@@ -1165,10 +841,11 @@ export default {
         this.table_loading = true;
         this.tableData = [];
         this.getTableData(data.id, data.label);
+        this.nodeData = data;
+        console.log(this.nodeData);
       }
     },
     append(isLeaf) {
-      this.checkDiseasename();
       if (this.diseaseNameisOnly == false) {
         return false;
       }
@@ -1223,6 +900,8 @@ export default {
           console.log(response.data);
           this.showDataForm = {};
           this.tableData = [];
+          this.nodeData={};
+          this.getCatgory();
         })
         .catch((error) => {
           console.log(error);
@@ -1253,7 +932,6 @@ export default {
     markNode(data) {
       console.log(data);
       this.nodeData = data;
-      this.checkIsCommon = this.nodeData.isCommon;
     },
 
     cleanInput() {
@@ -1281,8 +959,6 @@ export default {
         },
       };
       this.$axios(this.options).then((res) => {
-        //console.log("数据:")
-        // console.log(res.data);
         this.getCatgory();
       });
     },
@@ -1355,7 +1031,11 @@ export default {
     openAddDataForm(type) {
       this.addDataForm = {
         dataName: "",
+        uid: sessionStorage.getItem("userid"),
+        username: sessionStorage.getItem("username"),
         createUser: sessionStorage.getItem("username"),
+        isUpload:"0",
+        isFilter:"1",
         characterList: [
           {
             opt: "",
@@ -1417,9 +1097,7 @@ export default {
     },
     importData() {
       // 涉及疾病填入上一级节点名
-      let paths = this.nodeData.path.split("/");
-      console.log(paths);
-      this.dialogForm.dataDisease = paths[paths.length - 1];
+      this.dialogForm.dataDisease = this.nodeData.label;
       this.dialogFormVisible = true;
     },
 
@@ -1468,13 +1146,30 @@ export default {
     },
 
     changeFile() {
-      console.log(this.$refs["uploadRef"].uploadFiles);
       if (this.dialogForm.tableName.length < 1) {
         this.dialogForm.tableName = this.removeFileExtension(
           this.$refs["uploadRef"].uploadFiles[0].name
         );
       }
     },
+
+    changeStatus() {
+      getRequest("/api/changeStatus", this.nodeData)
+        .then((response) => {
+          if (response.code == 200) {
+            this.getCatgory();
+            this.tableData = [];
+            this.nodeData={};
+            this.$message.success("操作成功");
+            //获取数据信息
+
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
   },
 };
 </script>
@@ -1486,7 +1181,7 @@ export default {
   height: 820px;
 }
 
-#top_buttons > * {
+#top_buttons>* {
   display: inline-block;
 }
 
@@ -1721,7 +1416,13 @@ h3 {
 
 .csv_btn {
   position: absolute;
-  right: 5%;
+  right: 2%;
+  top: 5%;
+}
+
+.change_btn {
+  position: absolute;
+  right: 10%;
   top: 5%;
 }
 
