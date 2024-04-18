@@ -139,6 +139,7 @@ export default {
     logout() {
       sessionStorage.clear();
       this.$router.replace("/");
+      location.reload();
     }
   },
 };

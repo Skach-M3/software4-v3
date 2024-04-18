@@ -38,8 +38,8 @@
       </div>
       <div class="right_table">
         <el-card class="right_table_topCard">
-          <div>
-            <h3>数据预览</h3>
+          <div style="height: 50px; padding-left: 5px">
+            <h3 style="margin-top:-20px">数据预览</h3>
           </div>
           <div class="describe_content">
             <p>
