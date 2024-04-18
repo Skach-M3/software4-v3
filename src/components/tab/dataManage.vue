@@ -7,7 +7,61 @@
         <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
       </div>
       <hr class="hr-dashed" />
-      <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+      <el-tree ref="tree" :data="treeData1" :show-checkbox="false" node-key="id" default-expand-all
+        :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+        @check-change="handleCheckChange">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+            }}</span>
+          <span v-else>{{ node.label }}</span>
+          <span>
+            <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
+              cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
+              <el-button v-if="data.catLevel == 3 && data.status != 2" icon="el-icon-circle-plus-outline" size="mini"
+                type="text" slot="reference" @click="markNode(data)">
+              </el-button>
+            </el-popconfirm>
+
+            <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
+              cancel-button-text="取消" @confirm="() => remove(node, data)">
+              <el-button v-if="(data.isLeafs == 1 &&
+          data.status == 0) ||
+          (data.uid == loginUserID && data.status != 2)
+          " icon="el-icon-delete" size="mini" type="text" slot="reference">
+              </el-button>
+            </el-popconfirm>
+
+          </span>
+        </span>
+      </el-tree>
+      <el-tree ref="tree" :data="treeData2" :show-checkbox="false" node-key="id" default-expand-all
+        :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+        @check-change="handleCheckChange">
+        <span class="custom-tree-node" slot-scope="{ node, data }">
+          <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+            }}</span>
+          <span v-else>{{ node.label }}</span>
+          <span>
+            <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
+              cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
+              <el-button v-if="data.catLevel == 3 && data.status != 2" icon="el-icon-circle-plus-outline" size="mini"
+                type="text" slot="reference" @click="markNode(data)">
+              </el-button>
+            </el-popconfirm>
+
+            <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
+              cancel-button-text="取消" @confirm="() => remove(node, data)">
+              <el-button v-if="(data.isLeafs == 1 &&
+          data.status == 0) ||
+          (data.uid == loginUserID && data.status != 2)
+          " icon="el-icon-delete" size="mini" type="text" slot="reference">
+              </el-button>
+            </el-popconfirm>
+
+          </span>
+        </span>
+      </el-tree>
+      <el-tree ref="tree" :data="treeData3" :show-checkbox="false" node-key="id" default-expand-all
         :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
         @check-change="handleCheckChange">
         <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -373,7 +427,9 @@ export default {
 
   data() {
     return {
-      treeData: [],
+      treeData1: [],
+      treeData2: [],
+      treeData3: [],
       tableData: [], //总共的列表数据
       itemHeight: 48, // item高度
       num: 10, // 展示的数据
@@ -494,33 +550,6 @@ export default {
   },
 
   created() {
-    this.checkTableName = this.debounce(() => {
-      getRequest("/api/DataTable/inspection", {
-        newname: this.dialogForm.tableName,
-      }).then((res) => {
-        console.log(res);
-        // 上一次重复了这一次不重复就要提醒一下
-        if (!this.dialogForm.isOnly && res.data) {
-          this.$message({
-            showClose: true,
-            message: "表名可用",
-            type: "success",
-          });
-        }
-        if (typeof res.data === "boolean") {
-          this.dialogForm.isOnly = res;
-        }
-        if (!res.data) {
-          this.$message({
-            showClose: true,
-            message: "数据表重名，请重新填写",
-            type: "warning",
-          });
-          return false;
-        }
-        return true;
-      });
-    }, 200);
     this.checkAddTaleName = this.debounce(() => {
       getRequest("/api/DataTable/inspection", {
         newname: this.addDataForm.dataName,
@@ -773,7 +802,9 @@ export default {
     getCatgory() {
 
       getCategory(`/api/category?uid=${this.loginUserID}`).then((response) => {
-        this.treeData = response.data;
+        this.treeData1 = response.data.slice(0,1);
+        this.treeData2 = response.data.slice(1,2);
+        this.treeData3 = response.data.slice(2,3);
         // 获取病种和数据集总数
         this.diseaseNum =
           response.data[0].children.length + response.data[1].children.length;

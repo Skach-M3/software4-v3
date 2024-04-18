@@ -8,7 +8,25 @@
           <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
         </div>
         <hr class="hr-dashed" />
-        <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+        <el-tree ref="tree" :data="treeData1" v-if="treeData1.length>0" :show-checkbox="false" node-key="id" default-expand-all
+          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+          @check="changeData" @check-change="handleCheckChange">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+              }}</span>
+            <span v-else>{{ node.label }}</span>
+          </span>
+        </el-tree>
+        <el-tree ref="tree" :data="treeData2" v-if="treeData2.length>0" :show-checkbox="false" node-key="id" default-expand-all
+          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+          @check="changeData" @check-change="handleCheckChange">
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+              }}</span>
+            <span v-else>{{ node.label }}</span>
+          </span>
+        </el-tree>
+        <el-tree ref="tree" :data="treeData3" v-if="treeData3.length>0" :show-checkbox="false" node-key="id" default-expand-all
           :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
           @check="changeData" @check-change="handleCheckChange">
           <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -110,6 +128,9 @@ export default {
   data() {
     return {
       treeData: [],
+      treeData1: [],
+      treeData2: [],
+      treeData3: [],
       nodeData: {},
       tableData: [], //总共的列表数据
       itemHeight: 48, // item高度
@@ -249,12 +270,14 @@ export default {
 
     getCatgory() {
       getCategory(`/api/category?uid=${this.loginUserID}`).then((response) => {
-        console.log(response.data);
         // 如果是多疾病任务，只能选择公共数据集
         if (this.moduleName == "factorDis") {
           const tempData = this.filterTreeByLabel(response.data,'多疾病');
           // console.log(tempData);
           this.treeData = tempData;
+          this.treeData1 = this.treeData.slice(0,1);
+          this.treeData2 = this.treeData.slice(1,2);
+          this.treeData3 = this.treeData.slice(2,3);
           // 为什么find不能用
           // const publicNode = response.data.find((node)=>{
           //   node.id == '1010';
@@ -262,16 +285,18 @@ export default {
           // console.log(publicNode);
           // this.treeData = this.filterTree(publicNode)
         } else {
-          this.treeData = this.filterTree(response.data);
+          // this.treeData = this.filterTree(response.data);
+          this.treeData1 = this.filterTree(response.data.slice(0,1));
+          this.treeData2 = this.filterTree(response.data.slice(1,2));
+          this.treeData3 = this.filterTree(response.data.slice(2,3));
         }
-        console.log(this.treeData);
         // 获取病种和数据集总数
         this.diseaseNum =
           response.data[0].children.length + response.data[1].children.length;
         getRequest("/api/getTableNumber").then((res) => {
           if (res.code == 200) this.datasetNum = res.data;
         });
-        if (this.treeData.length < 1) {
+        if (this.treeData1.length+this.treeData2.length+this.treeData3.length < 1) {
           this.$message({
             showClose: true,
             type: "warning",
