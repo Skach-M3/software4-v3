@@ -149,10 +149,6 @@ export default {
   color: white;
 }
 
-.el-menu-item {
-  color: aliceblue;
-}
-
 .el-menu-vertical-demo span {
   font-size: 14px;
 }
@@ -169,7 +165,7 @@ export default {
   background-color: #071135;
   color: #333;
   /* text-align: center; */
-  line-height: 60px;
+  line-height: 59px;
 }
 
 .side {
