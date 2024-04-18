@@ -14,6 +14,8 @@ import userManage from "@/components/tab/userManage.vue";
 import Login from "@/components/login/Login.vue";
 import Register from "@/components/login/register.vue";
 import TaskResult from "@/components/tab/subcomponents/TaskResult.vue";
+import DisSetting from "@/components/tab/DisSetting.vue"
+import LogManage from "@/components/tab/LogManage.vue"
 // import LogIn from "@/views/LogIn.vue"
 import SoftwareIntro from "@/components/tab/SoftwareIntro.vue";
 Vue.use(VueRouter)
@@ -91,6 +93,17 @@ const routes = [
         name: "FactorDis",
         component: FactorDis,
       },
+      {
+        path: "DisSetting",
+        name: "DisSetting",
+        component: DisSetting,
+      },
+      {
+        path: "LogManage",
+        name: "LogManage",
+        component: LogManage,
+      },
+
     ],
   },
 ];

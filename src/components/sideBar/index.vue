@@ -71,11 +71,11 @@
               <i class="el-icon-s-data"></i>
               <span slot="title">数据管理</span>
             </el-menu-item>
-            <el-menu-item index="">
+            <el-menu-item index="/sideBar/LogManage">
               <i class="el-icon-message-solid"></i>
               <span slot="title">日志查看</span>
             </el-menu-item>
-            <el-menu-item index="">
+            <el-menu-item index="/sideBar/disSetting">
               <i class="el-icon-suitcase"></i>
               <span slot="title">病种设置</span>
             </el-menu-item>
