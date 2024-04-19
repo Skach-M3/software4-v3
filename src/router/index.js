@@ -14,8 +14,9 @@ import userManage from "@/components/tab/userManage.vue";
 import Login from "@/components/login/Login.vue";
 import Register from "@/components/login/register.vue";
 import TaskResult from "@/components/tab/subcomponents/TaskResult.vue";
-import DisSetting from "@/components/tab/DisSetting.vue"
-import LogManage from "@/components/tab/LogManage.vue"
+import AdminDataManage from "@/components/tab/AdminDataManage.vue";
+import DisSetting from "@/components/tab/DisSetting.vue";
+import LogManage from "@/components/tab/LogManage.vue";
 // import LogIn from "@/views/LogIn.vue"
 import SoftwareIntro from "@/components/tab/SoftwareIntro.vue";
 Vue.use(VueRouter)
@@ -52,6 +53,11 @@ const routes = [
         path: "dataManage",
         name: "dataManage",
         component: dataManage,
+      },
+      {
+        path: "AdminDataManage",
+        name: "AdminDataManage",
+        component: AdminDataManage,
       },
       {
         path: "userManage",

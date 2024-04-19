@@ -577,6 +577,33 @@ export default {
         return true;
       });
     }, 200);
+    this.checkTableName  = this.debounce(() => {
+      getRequest("/api/DataTable/inspection", {
+        newname: this.addDataForm.dataName,
+      }).then((res) => {
+        console.log(res);
+        // 上一次重复了这一次不重复就要提醒一下
+        if (!this.dialogForm.isOnly && res.data) {
+          this.$message({
+            showClose: true,
+            message: "表名可用",
+            type: "success",
+          });
+        }
+        if (typeof res.data === "boolean") {
+          this.dialogForm.isOnly = res;
+        }
+        if (!res.data) {
+          this.$message({
+            showClose: true,
+            message: "数据表重名，请重新填写",
+            type: "warning",
+          });
+          return false;
+        }
+        return true;
+      });
+    }, 200);
     this.getCatgory();
   },
 

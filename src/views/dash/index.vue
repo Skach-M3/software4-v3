@@ -319,7 +319,9 @@ export default {
         if (res.code == 200) {
           this.table_value_options = res.data;
           this.table_value = this.table_value_options[0];
-          this.table_val_change();
+          if(this.table_value_options.length !== 0){
+            this.table_val_change();
+          }
         } else {
           this.$message.error("获取数据失败");
         }
@@ -354,19 +356,19 @@ export default {
           this.$message.error("获取数据失败");
         }
       });
-      getRequest("stastic/get_pos_neg").then((res) => {
-        if (res.code == 200) {
-          this.bar_x = Object.keys(res.data);
-          let array = Object.values(res.data);
-          for (let index = 0; index < array.length; index++) {
-            const element = array[index];
-            this.bar_neg.push(element.neg);
-            this.bar_pos.push(element.pos);
-          }
-        } else {
-          this.$message.error("获取数据失败");
-        }
-      });
+      // getRequest("stastic/get_pos_neg").then((res) => {
+      //   if (res.code == 200) {
+      //     this.bar_x = Object.keys(res.data);
+      //     let array = Object.values(res.data);
+      //     for (let index = 0; index < array.length; index++) {
+      //       const element = array[index];
+      //       this.bar_neg.push(element.neg);
+      //       this.bar_pos.push(element.pos);
+      //     }
+      //   } else {
+      //     this.$message.error("获取数据失败");
+      //   }
+      // });
     },
     table_val_change() {
       this.fill_rate_loading = true;

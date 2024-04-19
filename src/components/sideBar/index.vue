@@ -67,7 +67,7 @@
               <i class="el-icon-info"></i>
               <span slot="title">信息发布</span>
             </el-menu-item>
-            <el-menu-item index="">
+            <el-menu-item index="/sideBar/AdminDataManage">
               <i class="el-icon-s-data"></i>
               <span slot="title">数据管理</span>
             </el-menu-item>
