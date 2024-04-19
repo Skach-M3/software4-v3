@@ -687,7 +687,6 @@ import { getFetures } from "@/api/feature.js";
 import { getCategory, addDisease, removeCate } from "@/api/category";
 import { getTableDes, getTableData } from "@/api/tableDescribe.js";
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
-import { disOptions } from "@/components/tab/constData.js";
 import { resetForm, debounce } from "@/components/mixins/mixin.js";
 let id = 1000;
 
@@ -818,7 +817,6 @@ export default {
       loadText2: "拼命加载中",
       disease: "",
       creator: "",
-      disOptions,
       featuresVision: false,
       DatadialogVisible: false,
       featuresMap: {},

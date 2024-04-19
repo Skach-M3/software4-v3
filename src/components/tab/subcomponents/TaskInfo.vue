@@ -42,29 +42,6 @@
           v-model="taskInfoForm.tips"
         ></el-input>
       </el-form-item>
-
-      <!-- 原来的疾病选择 -->
-      <!-- <el-form-item prop="disease">
-        <template slot="label">
-          <span class="lineStyle">▍</span>
-          <span>研究病种</span>
-        </template>
-        <el-radio-group
-          id="disGroup"
-          v-model="taskInfoForm.disease"
-          ref="disGroup"
-        >
-          <el-radio
-            v-for="(dis, index) in disOptions"
-            :key="index"
-            :label="dis.name"
-            class="disGroup-item"
-            border
-            :disabled="dis.disable"
-            >{{ dis.name }}</el-radio
-          >
-        </el-radio-group>
-      </el-form-item> -->
       <el-form-item>
         <el-button @click="resetForm('taskInfoForm')" round>重置</el-button>
         <el-button type="primary" @click="next()" round>下一步</el-button>
@@ -74,7 +51,6 @@
 </template>
 
 <script>
-// import { disOptions } from "@/components/tab/constData.js";
 import { resetForm } from "@/components/mixins/mixin.js";
 import vuex_mixin from "@/components/mixins/vuex_mixin";
 import { mapMutations } from "vuex";
@@ -91,7 +67,6 @@ export default {
   computed: {},
   data() {
     return {
-      // disOptions: disOptions,
       taskInfoForm: {
         taskName: "",
         principal: "",

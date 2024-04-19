@@ -35,7 +35,7 @@
             active-text-color="#ffd04b"
             @select="changeMenu()"
           >
-            <el-menu-item index="/sideBar/dash">
+            <el-menu-item index="/dash">
               <i class="el-icon-s-operation"></i>
               <span slot="title">首页</span>
             </el-menu-item>
@@ -48,25 +48,25 @@
                 <i class="el-icon-folder"></i>
                 <span>任务管理</span>
               </template>
-              <el-menu-item index="/sideBar/taskManage">
+              <el-menu-item index="/taskManage">
                 <i class="el-icon-s-order"></i>
                 <span slot="title">历史任务查看</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/DisFactor">
+              <el-menu-item index="/DisFactor">
                 <i class="el-icon-menu"></i>
                 <span slot="title">疾病危险因素挖掘</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/F_Factor">
+              <el-menu-item index="/F_Factor">
                 <i class="el-icon-menu"></i>
                 <span slot="title">危险因素相关因素挖掘</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/FactorDis">
+              <el-menu-item index="/FactorDis">
                 <i class="el-icon-menu"></i>
                 <span slot="title">危险因素相关疾病挖掘</span>
               </el-menu-item>
             </el-submenu>
 
-            <el-menu-item index="/sideBar/dataManage">
+            <el-menu-item index="/dataManage">
               <i class="el-icon-s-data"></i>
               <span slot="title">数据管理</span>
             </el-menu-item>
@@ -77,30 +77,30 @@
                 <span>系统管理</span>
               </template>
 
-              <el-menu-item index="/sideBar/userManage">
+              <el-menu-item index="/userManage">
                 <i class="el-icon-user-solid"></i>
                 <span slot="title">用户管理</span>
               </el-menu-item>
-              <el-menu-item index="">
+              <el-menu-item index="/inform">
                 <i class="el-icon-info"></i>
                 <span slot="title">信息发布</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/AdminDataManage">
+              <el-menu-item index="/AdminDataManage">
                 <i class="el-icon-s-data"></i>
-                <span slot="title">数据管理</span>
+                <span slot="title">系统数据管理</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/LogManage">
+              <el-menu-item index="/LogManage">
                 <i class="el-icon-message-solid"></i>
                 <span slot="title">日志查看</span>
               </el-menu-item>
-              <el-menu-item index="/sideBar/disSetting">
+              <el-menu-item index="/disSetting">
                 <i class="el-icon-suitcase"></i>
                 <span slot="title">病种设置</span>
               </el-menu-item>
             </el-submenu>
 
             <div class="menu-footer">
-              <el-menu-item index="/sideBar/SoftwareIntro">
+              <el-menu-item index="/SoftwareIntro">
                 软件介绍</el-menu-item
               >
               <el-menu-item> 操作手册</el-menu-item>
@@ -161,6 +161,9 @@ export default {
 </script>
 
 <style scoped>
+*{
+  user-select: none;
+}
 .el-icon-mobile-phone {
   color: white;
 }

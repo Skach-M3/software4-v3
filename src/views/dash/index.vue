@@ -185,7 +185,7 @@ import Sprit from "@/components/tab/subcomponents/Sprit.vue";
 import Bar from "@/components/tab/subcomponents/Bar.vue";
 export default {
   name: "index",
-  components: { LineChartVue, Pie, Sprit, Bar },
+  components: { LineChartVue, Pie, Sprit },
   computed: {
     //  ...mapState(["modelList", "dataList", "taskList"]),
     ...mapState(["modelList"]),
@@ -503,13 +503,10 @@ export default {
   text-align: center;
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 20px;
 }
 
 .top_statistic_card_right .el-card {
-  display: inline-block;
-  width: 220px;
-  height: 100px;
-  margin: 1%;
   padding: 10px;
   border: 1px solid #fff;
   border-radius: 10px;
