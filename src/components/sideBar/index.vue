@@ -2,20 +2,39 @@
   <div>
     <el-container class="con">
       <el-header class="header">
-        <el-menu background-color="#071135" text-color="#fff" active-text-color="#fff" class="el-menu-demo"
-          mode="horizontal">
+        <el-menu
+          background-color="#071135"
+          text-color="#fff"
+          active-text-color="#fff"
+          class="el-menu-demo"
+          mode="horizontal"
+        >
           <span index="1" style="float: left; color: cornflowerblue">
             <i class="el-icon-box"></i>
-            <span style="font-size:20px">多病种疾病危险因素关联关系挖掘工具软件</span></span>
+            <span style="font-size: 20px"
+              >多病种疾病危险因素关联关系挖掘工具软件</span
+            ></span
+          >
           <!--            <template slot="title">当前服务器：</template>-->
-          <el-menu-item index="2" style="float: right" @click="logout"><i class="el-icon-close"></i>退出登录</el-menu-item>
-          <span index="3" style="float: right;color:#fff"><i class="el-icon-user"></i>欢迎您{{ LoginUserName }}</span>
+          <el-menu-item index="2" style="float: right" @click="logout"
+            ><i class="el-icon-close"></i>退出登录</el-menu-item
+          >
+          <span index="3" style="float: right; color: #fff"
+            ><i class="el-icon-user"></i>欢迎您{{ LoginUserName }}</span
+          >
         </el-menu>
       </el-header>
       <el-container>
         <el-aside width="215px" class="side">
-          <el-menu :default-active=activeIndex router class="el-menu-vertical-demo" background-color="#071135"
-            text-color="#fff" active-text-color="#ffd04b" @select="changeMenu()">
+          <el-menu
+            :default-active="activeIndex"
+            router
+            class="el-menu-vertical-demo"
+            background-color="#071135"
+            text-color="#fff"
+            active-text-color="#ffd04b"
+            @select="changeMenu()"
+          >
             <el-menu-item index="/sideBar/dash">
               <i class="el-icon-s-operation"></i>
               <span slot="title">首页</span>
@@ -52,43 +71,40 @@
               <span slot="title">数据管理</span>
             </el-menu-item>
 
-
             <el-submenu index="2" v-if="role == 0">
               <template slot="title">
                 <i class="el-icon-setting"></i>
                 <span>系统管理</span>
               </template>
-              
-            <el-menu-item index="/sideBar/userManage" >
-              <i class="el-icon-user-solid"></i>
-              <span slot="title">用户管理</span>
-            </el-menu-item>
-            <el-menu-item index="">
-              <i class="el-icon-info"></i>
-              <span slot="title">信息发布</span>
-            </el-menu-item>
-            <el-menu-item index="/sideBar/AdminDataManage">
-              <i class="el-icon-s-data"></i>
-              <span slot="title">数据管理</span>
-            </el-menu-item>
-            <el-menu-item index="/sideBar/LogManage">
-              <i class="el-icon-message-solid"></i>
-              <span slot="title">日志查看</span>
-            </el-menu-item>
-            <el-menu-item index="/sideBar/disSetting">
-              <i class="el-icon-suitcase"></i>
-              <span slot="title">病种设置</span>
-            </el-menu-item>
+
+              <el-menu-item index="/sideBar/userManage">
+                <i class="el-icon-user-solid"></i>
+                <span slot="title">用户管理</span>
+              </el-menu-item>
+              <el-menu-item index="">
+                <i class="el-icon-info"></i>
+                <span slot="title">信息发布</span>
+              </el-menu-item>
+              <el-menu-item index="/sideBar/AdminDataManage">
+                <i class="el-icon-s-data"></i>
+                <span slot="title">数据管理</span>
+              </el-menu-item>
+              <el-menu-item index="/sideBar/LogManage">
+                <i class="el-icon-message-solid"></i>
+                <span slot="title">日志查看</span>
+              </el-menu-item>
+              <el-menu-item index="/sideBar/disSetting">
+                <i class="el-icon-suitcase"></i>
+                <span slot="title">病种设置</span>
+              </el-menu-item>
             </el-submenu>
-            
-
-
 
             <div class="menu-footer">
-              <el-menu-item index="/sideBar/SoftwareIntro"> 软件介绍</el-menu-item>
+              <el-menu-item index="/sideBar/SoftwareIntro">
+                软件介绍</el-menu-item
+              >
               <el-menu-item> 操作手册</el-menu-item>
             </div>
-
           </el-menu>
         </el-aside>
         <el-main class="main">
@@ -99,17 +115,16 @@
 
       <el-footer>
         <h1>
-          重庆邮电大学 大数据智能计算创新研发团队 @CopyRight 2020-2024 All Rights
-          Reserved
+          重庆邮电大学 大数据智能计算创新研发团队 @CopyRight 2020-2024 All
+          Rights Reserved
         </h1>
       </el-footer>
-
     </el-container>
   </div>
 </template>
 
 <script>
-import { mapMutations } from 'vuex';
+import { mapMutations } from "vuex";
 // import AppMain from "@/components/AppMain";
 export default {
   // components: { AppMain },
@@ -121,14 +136,14 @@ export default {
     // 写在data里使用router.push时更改vuex后该值不会响应式更新
     activeIndex() {
       return this.$store.state.sideBarPath;
-    }
+    },
   },
   data() {
     return {
       // activeIndex: this.$store.state.sideBarPath,
       // describVision: false,
-      LoginUserName: '',
-      role: ''
+      LoginUserName: "",
+      role: "",
     };
   },
   methods: {
@@ -140,7 +155,7 @@ export default {
       sessionStorage.clear();
       this.$router.replace("/");
       location.reload();
-    }
+    },
   },
 };
 </script>
@@ -199,5 +214,4 @@ export default {
   bottom: 0;
   margin-left: 40px;
 }
-
 </style>

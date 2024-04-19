@@ -249,7 +249,7 @@ export default {
     },
     getInfoDisease(row){
       console.log(row)
-      if(row.parentId=="0"){
+      if(row.parentId=="1"){
         this.editDialogDiseaseVisible = true
         this.updateDiseaseParam.categoryId = row.id
         this.updateDiseaseParam.firstDisease = row.label
