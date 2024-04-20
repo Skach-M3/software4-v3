@@ -61,7 +61,16 @@
         > -->
       </div>
 
-      <el-table :data="currentUserList" stripe style="width: 100%"  :header-cell-style="{ backgroundColor: '#e8e5e5', color: 'black', fontWeight: 'bold'}">
+      <el-table
+        :data="currentUserList"
+        stripe
+        style="width: 100%"
+        :header-cell-style="{
+          backgroundColor: '#e8e5e5',
+          color: 'black',
+          fontWeight: 'bold',
+        }"
+      >
         <el-table-column
           prop="username"
           label="用户名称"
@@ -95,10 +104,18 @@
             </div>
             <div v-show="!scope.row.editing">
               <!-- 默认显示状态文本，点击可以切换到编辑模式 -->
-              <el-tag :type="getRoleTagType(scope.row.role)">{{
+              <!-- <el-tag :type="getRoleTagType(scope.row.role)">{{
                 options[scope.row.role].label
-              }}</el-tag>
+              }}</el-tag> -->
+                  <el-tag
+                :type="getRoleTagType(scope.row.role)"
+                v-if="scope.row.role !== null"
+              >
+                {{ options[scope.row.role].label }}
+              </el-tag>
+              <el-tag v-else></el-tag>
             </div>
+        
           </template>
         </el-table-column>
         <el-table-column
@@ -146,9 +163,13 @@
             </div>
             <div v-show="!scope.row.editing">
               <!-- 默认显示状态文本，点击可以切换到编辑模式 -->
-              <el-tag :type="getTagType(scope.row.userStatus)">{{
-                statusOptions[scope.row.userStatus].label
-              }}</el-tag>
+              <el-tag
+                :type="getTagType(scope.row.userStatus)"
+                v-if="scope.row.userStatus !== null"
+              >
+                {{ statusOptions[scope.row.userStatus].label }}
+              </el-tag>
+              <el-tag v-else></el-tag>
             </div>
           </template>
         </el-table-column>
@@ -181,17 +202,17 @@
           </template>
         </el-table-column>
       </el-table>
-    <div class="pagination">
-      <el-pagination
-        @current-change="handleCurrentChange"
-        :current-page="this.currentPage"
-        :page-size="10"
-        layout="total, prev, pager, next, jumper"
-        :total="this.currentTotal"
-        style="margin-top: 2%; margin-left: 3%"
-      >
-      </el-pagination>
-    </div>
+      <div class="pagination">
+        <el-pagination
+          @current-change="handleCurrentChange"
+          :current-page="this.currentPage"
+          :page-size="10"
+          layout="total, prev, pager, next, jumper"
+          :total="this.currentTotal"
+          style="margin-top: 2%; margin-left: 3%"
+        >
+        </el-pagination>
+      </div>
     </el-card>
 
     <!-- <el-dialog title="新增用户" :visible.sync="addUserDialogVisible">
@@ -334,17 +355,17 @@ export default {
 
   created() {
     this.getUserTable(1);
-    this.getUserAll()
+    this.getUserAll();
   },
 
   methods: {
-      getUserAll(){
-          getRequest('user/querUser').then((res)=>{
-              if(res){
-                    this.tableData = res;
-              }
-          })
-      },
+    getUserAll() {
+      getRequest("user/querUser").then((res) => {
+        if (res) {
+          this.tableData = res;
+        }
+      });
+    },
     getUserTable(pageNum) {
       getRequest("user/allUser?pageNum=" + pageNum).then((res) => {
         if (res) {
@@ -357,8 +378,9 @@ export default {
           }));
           this.total = res.total;
           this.filterData(); // 加载完数据后进行筛选
-             this.currentTotal = res.total;s
-         
+          this.tableData = dataWithEditing;
+          this.currentTotal = res.total;
+          this.currentUserList=dataWithEditing
         }
       });
     },
@@ -366,19 +388,23 @@ export default {
       if (row.editing) {
         this.saveChanges(row); // 如果当前是保存状态，保存数据
       }
-      row.editing = !row.editing; // 切换编辑状态
+      this.$set(row,"editing",!row.editing)
+      console.log('row',row.selectRole)
+      //row.editing = !row.editing; // 切换编辑状态
+      // this.$forceUpdate();
     },
     saveChanges(row) {
-
       const params = {
         uid: row.uid,
         status: row.selectStatus,
         role: row.selectRole,
         uploadSize: row.uploadSize,
       };
+      console.log('row.selectStatus',row.selectStatus)
       postRequest("user/updateStatus", params).then((res) => {
         if (res.code == 200) {
           this.$message.success("修改成功");
+          this.getUserTable(1);
         } else {
           this.$message.warning("修改失败！");
           this.getUserTable(1);
@@ -387,22 +413,22 @@ export default {
     },
 
     filterData() {
-
       let filteredData = this.tableData.filter((user) => {
-
-        const matchesRole = this.formInline.role!== ""
-          ? Number(user.role) === Number(this.formInline.role)
-          : true;
-        const matchesStatus = this.formInline.selectStatus!== ""
-          ? Number(user.userStatus) === Number(this.formInline.selectStatus)
-          : true;
+        const matchesRole =
+          this.formInline.role !== ""
+            ? Number(user.role) === Number(this.formInline.role)
+            : true;
+        const matchesStatus =
+          this.formInline.selectStatus !== ""
+            ? Number(user.userStatus) === Number(this.formInline.selectStatus)
+            : true;
         const matchesName = this.searchUser
           ? user.username.toLowerCase().includes(this.searchUser.toLowerCase())
           : true;
-        
+
         return matchesRole && matchesStatus && matchesName;
       });
-     
+
       this.currentUserList = filteredData;
       this.currentTotal = filteredData.length;
     },
@@ -417,7 +443,6 @@ export default {
     searchUserInData() {
       this.filterData();
     },
- 
 
     clearFilter() {
       this.currentUserList = this.tableData;
@@ -540,8 +565,8 @@ export default {
 .user_search_btn {
   margin-left: 1%;
 }
-.pagination{
-     display: flex;
-  justify-content: center; 
+.pagination {
+  display: flex;
+  justify-content: center;
 }
 </style>
