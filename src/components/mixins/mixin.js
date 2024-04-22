@@ -1,3 +1,4 @@
+import { method } from "lodash";
 
 export const tabSwitch = {
     data() {
@@ -34,6 +35,18 @@ export const debounce = {
         t = setTimeout(() => {
           fn.call(this);
         }, delay);
+      }
+    }
+  }
+}
+
+export const setCookie = {
+  method: {
+    setCookie (obj, limitTime) {
+      let data = new Date( new Date().getTime() + limitTime*24*60*60*1000 ).toUTCString();
+
+      for(let i in obj) {
+          document.cookie = i + '=' + obj[i] + ';expires=' + data;
       }
     }
   }

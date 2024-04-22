@@ -182,12 +182,10 @@ import { mapState } from "vuex";
 import LineChartVue from "@/components/tab/subcomponents/LineChart.vue";
 import Pie from "@/components/tab/subcomponents/Pie.vue";
 import Sprit from "@/components/tab/subcomponents/Sprit.vue";
-import Bar from "@/components/tab/subcomponents/Bar.vue";
 export default {
   name: "index",
   components: { LineChartVue, Pie, Sprit },
   computed: {
-    //  ...mapState(["modelList", "dataList", "taskList"]),
     ...mapState(["modelList"]),
   },
   data() {

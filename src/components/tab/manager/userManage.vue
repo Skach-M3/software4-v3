@@ -292,7 +292,7 @@
 </template>
 
 <script>
-import { getRequest, postRequest, saveParentDisease } from "@/api/user";
+import { getRequest, postRequest } from "@/api/user";
 import { resetForm } from "@/components/mixins/mixin";
 // import { filter } from 'vue/types/umd';
 export default {

@@ -197,6 +197,7 @@
 
 <script>
 import { getRequest, postRequest } from "@/utils/api";
+import { setCookie } from "@/components/mixins/mixin";
 export default {
   name: "Login",
 
@@ -265,7 +266,7 @@ export default {
             ...item,
             createTime: this.convertToBeijingTime(item.createTime),
           }));
-          this.notification = temp;
+          this.notification = temp.reverse();
        
         }
       });
@@ -294,6 +295,8 @@ export default {
                   sessionStorage.setItem("username", resp.data.username);
                   sessionStorage.setItem("userid", resp.data.uid);
                   sessionStorage.setItem("userrole", resp.data.role);
+                  document.cookie('uid=1225952')
+                  console.log(document.cookie);
                   this.$router.push("/sideBar");
                   this.$message.success("登录成功");
                 } else if (resp.data.userStatus === "2") {
@@ -395,6 +398,11 @@ li {
   right: 80px;
   margin-top: 40px;
 } */
+
+
+.text-photo1 .el-col img{
+  margin-left: 25%;
+}
 
 img.gif {
   position: absolute;

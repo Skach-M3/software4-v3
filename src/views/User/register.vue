@@ -32,7 +32,7 @@
                 color: gray;
                 font-size: 15px;
               "
-              ><返回</el-button
+              >←返回</el-button
             >
             <div class="myForm">
               <el-form
@@ -478,6 +478,11 @@ export default {
   display: flex;
   align-items: center;
 }
+
+.text-photo1 .el-col img{
+  margin-left: 25%;
+}
+
 img.gif {
   position: absolute;
   top: 479px;
