@@ -7,7 +7,8 @@
             src="http://www.cqupt.edu.cn/dfiles/13011/cqupt/img/favicon_128x128.ico"
             style="height: 100px; width: 100px"
           />
-          <h1>疾病危险因素与多病种疾病关联关系挖掘工具软件</h1>
+          <h1>疾病危险因素与多病种关联关系</h1>
+          <h1>挖掘工具软件</h1>
         </div>
         <div class="mainImg">
           <img
@@ -436,7 +437,7 @@ img.png {
   display: block;
   position: absolute;
   left: -480px;
-  top: -200px;
+  top: -150px;
 }
 
 .cooperation {

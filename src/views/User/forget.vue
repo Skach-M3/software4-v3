@@ -7,7 +7,8 @@
             src="http://www.cqupt.edu.cn/dfiles/13011/cqupt/img/favicon_128x128.ico"
             style="height: 100px; width: 100px"
           />
-          <h1>人群队列数据特征表征工具软件</h1>
+          <h1>疾病危险因素与多病种关联关系</h1>
+          <h1>挖掘工具软件</h1>
         </div>
         <div class="mainImg">
           <img
@@ -31,7 +32,7 @@
               color: gray;
               font-size: 15px;
             "
-            ><返回</el-button
+            >←返回</el-button
           >
           <div class="step">
             <el-steps :active="active" align-center>
@@ -195,11 +196,10 @@
 
 <script>
 import { postRequest, getRequest } from "@/utils/api";
-import { mapActions } from "vuex";
-import _ from "lodash";
+import { debounce } from "@/components/mixins/mixin";
 export default {
   name: "forget",
-
+  mixins: [debounce],
   data() {
      let checkPwd2 = (rule, value, callback) => {
       if (value.trim().length == 0) {
@@ -256,7 +256,7 @@ export default {
   created() {
     // 创建防抖函数，这里设置了500毫秒的延迟
 
-    this.debouncedCheckUsername = _.debounce(this.validateUsername, 500);
+    this.debouncedCheckUsername = this.debounce(this.validateUsername, 500);
   },
   mounted() {},
   methods: {
@@ -458,7 +458,7 @@ img.png {
   display: block;
   position: absolute;
   left: -480px;
-  top: -200px;
+  top: -150px;
 }
 
 .cooperation {

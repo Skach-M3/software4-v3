@@ -129,7 +129,7 @@ export default {
   },
   watch: {
     filterText(val) {
-      this.$refs.tree.filter(val);
+      this.$refs.tree?.filter(val);
     }
   },
   created() {

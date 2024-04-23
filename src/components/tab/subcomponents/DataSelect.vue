@@ -8,7 +8,9 @@
           <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
         </div>
         <hr class="hr-dashed" />
-        <el-tree ref="tree" :data="treeData1" v-if="treeData1.length>0" :show-checkbox="false" node-key="id" default-expand-all
+        <el-input placeholder="输入关键字进行过滤" v-model="filterText">
+        </el-input>
+        <el-tree ref="tree1" :data="treeData1" v-if="treeData1.length>0" :show-checkbox="false" node-key="id" default-expand-all
           :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -25,7 +27,7 @@
             </span>
           </span>
         </el-tree>
-        <el-tree ref="tree" :data="treeData2" v-if="treeData2.length>0" :show-checkbox="false" node-key="id" default-expand-all
+        <el-tree ref="tree2" :data="treeData2" v-if="treeData2.length>0" :show-checkbox="false" node-key="id" default-expand-all
           :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -42,7 +44,7 @@
             </span>
           </span>
         </el-tree>
-        <el-tree ref="tree" :data="treeData3" v-if="treeData3.length>0" :show-checkbox="false" node-key="id" default-expand-all
+        <el-tree ref="tree3" :data="treeData3" v-if="treeData3.length>0" :show-checkbox="false" node-key="id" default-expand-all
           :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
@@ -113,8 +115,6 @@
 </template>
 
 <script>
-// TODO:大数据预览卡顿， 需要做虚拟列表，动态渲染
-
 import { getCategory } from "@/api/category";
 import { getTableDes, getTableData } from "@/api/tableDescribe.js";
 import vuex_mixin from "@/components/mixins/vuex_mixin";
@@ -126,6 +126,23 @@ export default {
     moduleName: {
       type: String,
       default: "disFactor",
+    },
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree1?.filter(val);
+      this.$refs.tree2?.filter(val);
+      this.$refs.tree3?.filter(val);
+    },
+
+    length(val) {
+      // 超过10行数据，就按照最大40*10 400px高度的列表就行
+      if (val >= 10) {
+        this.$refs.listWrap.style.height = "550px";
+      } else {
+        // 不足10行数据，这边 加57是因为表头的高度，具体情况，你们加不加无所谓
+        this.$refs.listWrap.style.height = "550px";
+      }
     },
   },
   computed: {
@@ -151,6 +168,7 @@ export default {
       treeData1: [],
       treeData2: [],
       treeData3: [],
+      filterText: '',
       nodeData: {},
       tableData: [], //总共的列表数据
       itemHeight: 48, // item高度
@@ -183,17 +201,6 @@ export default {
   },
   mounted() {
     this.$refs.listWrap.style.height = "550px"; // 设置可视区域的高度
-  },
-  watch: {
-    length(val) {
-      // 超过10行数据，就按照最大40*10 400px高度的列表就行
-      if (val >= 10) {
-        this.$refs.listWrap.style.height = "550px";
-      } else {
-        // 不足10行数据，这边 加57是因为表头的高度，具体情况，你们加不加无所谓
-        this.$refs.listWrap.style.height = "550px";
-      }
-    },
   },
   methods: {
     init() {

@@ -454,9 +454,9 @@ export default {
       // }
     },
     filterText(val) {
-      this.$refs.tree1.filter(val);
-      this.$refs.tree2.filter(val);
-      this.$refs.tree3.filter(val);
+      this.$refs.tree1?.filter(val);
+      this.$refs.tree2?.filter(val);
+      this.$refs.tree3?.filter(val);
     }
   },
 

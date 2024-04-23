@@ -23,10 +23,10 @@ axios.defaults.baseURL='/api'
 //响应拦截器
 axios.interceptors.response.use(success=>{
     if(success.status&&success.status==200){
-        if(success.data.code==500||success.data.code==403){
+        // if(success.data.code==500||success.data.code==403){
             // Message.error({message: success.data.message});
-            return;
-        }
+            // return;
+        // }
         if(success.data.message){
             // Message.success({message:success.data.message});
         }
