@@ -54,7 +54,7 @@ export default {
 
       var option = {
         title: {
-          text: this.title+"特征填充率",
+          text: this.title+"特征完备率",
           left: 10
         },
         toolbox: {

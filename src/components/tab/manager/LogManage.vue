@@ -25,11 +25,11 @@
             label="操作人">
         </el-table-column>
         <el-table-column
-            prop="opTime"
+            prop="time"
             label="操作时间">
         </el-table-column>
         <el-table-column
-            prop="opType"
+            prop="operation"
             label="操作类型">
         </el-table-column>
       </el-table>
@@ -69,7 +69,7 @@ export  default {
     load(){
       getRequest(`userlog/getLogByPage?pageNum=${this.pageNum}&pageSize=${this.pageSize}&username=${this.username}`)
           .then(res =>{
-            this.tableData = res.data.records
+            this.tableData = res.data.list
             this.total = res.data.total
           })
     },

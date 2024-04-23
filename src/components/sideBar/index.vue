@@ -25,7 +25,7 @@
         </el-menu>
       </el-header>
       <el-container>
-        <el-aside width="215px" class="side">
+        <el-aside width="245px" class="side">
           <el-menu
             :default-active="activeIndex"
             router
@@ -58,11 +58,11 @@
               </el-menu-item>
               <el-menu-item index="/F_Factor">
                 <i class="el-icon-menu"></i>
-                <span slot="title">危险因素相关因素挖掘</span>
+                <span slot="title">危险因素关系挖掘</span>
               </el-menu-item>
               <el-menu-item index="/FactorDis">
                 <i class="el-icon-menu"></i>
-                <span slot="title">危险因素相关疾病挖掘</span>
+                <span slot="title">危险因素与多病种关系挖掘</span>
               </el-menu-item>
             </el-submenu>
 

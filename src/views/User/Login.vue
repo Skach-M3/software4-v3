@@ -295,8 +295,8 @@ export default {
                   sessionStorage.setItem("username", resp.data.username);
                   sessionStorage.setItem("userid", resp.data.uid);
                   sessionStorage.setItem("userrole", resp.data.role);
-                  document.cookie('uid=1225952')
-                  console.log(document.cookie);
+                  // document.cookie('uid=1225952')
+                  // console.log(document.cookie);
                   this.$router.push("/sideBar");
                   this.$message.success("登录成功");
                 } else if (resp.data.userStatus === "2") {

@@ -13,23 +13,14 @@
         </div> -->
       </div>
       <hr class="hr-dashed" />
-      <el-tree
-        ref="tree"
-        :data="treeData"
-        :show-checkbox="false"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-        :check-on-click-node="true"
-        :highlight-current="true"
-        @node-click="changeData"
-      >
+      <el-input placeholder="输入关键字进行过滤" v-model="filterText">
+      </el-input>
+      <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+        :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+        :filter-node-method="filterNode">
         <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span
-            v-if="data.catLevel == 1"
-            style="font-weight: bold; font-size: 15px; color: #252525"
-            >{{ node.label }}</span
-          >
+          <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+            }}</span>
           <span v-else>{{ node.label }}</span>
         </span>
       </el-tree>
@@ -52,45 +43,21 @@
       <div id="top_buttons">
         <div class="filter">
           <!-- <span>任务负责人：</span> -->
-          <el-select
-            v-model="leader"
-            placeholder="请选择任务负责人"
-            @change="pagehelper()"
-          >
-            <el-option
-              v-for="item in taskLeaderList"
-              :key="item"
-              :label="item"
-              :value="item"
-            >
+          <el-select v-model="leader" placeholder="请选择任务负责人" @change="pagehelper()">
+            <el-option v-for="item in taskLeaderList" :key="item" :label="item" :value="item">
             </el-option>
           </el-select>
         </div>
         <div class="filter">
           <!-- <span>任务类型：</span> -->
-          <el-select
-            v-model="tasktype"
-            placeholder="请选择任务类型"
-            @change="pagehelper()"
-          >
-            <el-option
-              v-for="item in taskTypeOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
+          <el-select v-model="tasktype" placeholder="请选择任务类型" @change="pagehelper()">
+            <el-option v-for="item in taskTypeOptions" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
           </el-select>
         </div>
         <div class="filter">
           <!-- <span>任务名称：</span> -->
-          <el-input
-            label=""
-            placeholder="请输入任务名称"
-            v-model="searchTask"
-            style="display: inline"
-            @change="pagehelper()"
-          >
+          <el-input label="" placeholder="请输入任务名称" v-model="searchTask" style="display: inline" @change="pagehelper()">
           </el-input>
         </div>
         <el-button @click="clearFilter()">清除</el-button>
@@ -99,33 +66,20 @@
             新建任务<i class="el-icon-arrow-down el-icon--right"></i>
           </el-button>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="/sideBar/DisFactor"
-              >疾病危险因素挖掘</el-dropdown-item
-            >
-            <el-dropdown-item command="/sideBar/F_Factor"
-              >危险因素相关因素挖掘</el-dropdown-item
-            >
-            <el-dropdown-item command="/sideBar/FactorDis"
-              >危险因素相关疾病挖掘</el-dropdown-item
-            >
+            <el-dropdown-item command="/sideBar/DisFactor">疾病危险因素挖掘</el-dropdown-item>
+            <el-dropdown-item command="/sideBar/F_Factor">危险因素相关因素挖掘</el-dropdown-item>
+            <el-dropdown-item command="/sideBar/FactorDis">危险因素相关疾病挖掘</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
 
       <!--===============================    卡片组     ==============================================================-->
       <div class="cardGroup">
-        <el-card
-          class="taskCard"
-          v-for="item in currentTaskList"
-          :key="item.id"
-          shadow="always"
-          v-show="
-            !(disease || leader) ||
-            (disease == item.disease && !leader) ||
-            (leader == item.leader && !disease) ||
-            (disease == item.disease && leader == item.leader)
-          "
-        >
+        <el-card class="taskCard" v-for="item in currentTaskList" :key="item.id" shadow="always" v-show="!(disease || leader) ||
+          (disease == item.disease && !leader) ||
+          (leader == item.leader && !disease) ||
+          (disease == item.disease && leader == item.leader)
+          ">
           <div class="cardInfo">
             <div><span class="ttl">任务名称：</span>{{ item.taskname }}</div>
             <div><span class="ttl">负责人：</span>{{ item.leader }}</div>
@@ -135,36 +89,16 @@
             <div><span class="ttl">创建时间：</span>{{ item.createtime }}</div>
           </div>
           <div class="editButton">
-            <el-button
-              size="mini"
-              type="primary"
-              @click="handleCheck(item)"
-              style="margin-right: 20px"
-              >查看</el-button
-            >
-            <el-popconfirm
-              title="删除后无法恢复"
-              icon="el-icon-warning"
-              icon-color="red"
-              @confirm="handleDelete(item)"
-            >
-              <el-button slot="reference" size="mini" type="danger"
-                >删除</el-button
-              >
+            <el-button size="mini" type="primary" @click="handleCheck(item)" style="margin-right: 20px">查看</el-button>
+            <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" @confirm="handleDelete(item)">
+              <el-button slot="reference" size="mini" type="danger">删除</el-button>
             </el-popconfirm>
           </div>
         </el-card>
       </div>
-      <el-pagination
-        class="pagination"
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="this.params.page"
-        :page-sizes="[6, 9, 12, 15, 24]"
-        :page-size="this.params.size"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="this.total"
-      >
+      <el-pagination class="pagination" @size-change="handleSizeChange" @current-change="handleCurrentChange"
+        :current-page="this.params.page" :page-sizes="[6, 9, 12, 15, 24]" :page-size="this.params.size"
+        layout="total, sizes, prev, pager, next, jumper" :total="this.total">
       </el-pagination>
     </div>
   </div>
@@ -182,6 +116,11 @@ export default {
     loginUserID() {
       return sessionStorage.getItem("userid");
     },
+  },
+  watch: {
+    filterText(val) {
+      this.$refs.tree.filter(val);
+    }
   },
   created() {
     this.getCatgory();
@@ -222,12 +161,17 @@ export default {
           value: "factorDis",
         },
       ],
+      filterText: ''
     };
   },
 
   methods: {
     ...mapActions(["getTaskList", "getTreeData"]),
     ...mapMutations(["SetTaskList"]),
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
     handleCommand(command) {
       this.$router.push(command);
     },
@@ -374,7 +318,7 @@ h3 {
   margin-bottom: 20px;
 }
 
-#top_buttons > * {
+#top_buttons>* {
   display: inline-block;
 }
 
@@ -421,7 +365,8 @@ h3 {
 /* 第五个子元素（数据表） */
 .cardInfo>div:nth-child(6)
 
-/* 第六个子元素（创建时间） */ {
+/* 第六个子元素（创建时间） */
+  {
   grid-column: 1 / span 2;
   /* 这两个元素跨越两列 */
 }
@@ -461,7 +406,7 @@ h3 {
   vertical-align: top;
 }
 
-.el-dropdown + .el-dropdown {
+.el-dropdown+.el-dropdown {
   margin-left: 15px;
 }
 

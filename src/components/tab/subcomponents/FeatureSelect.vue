@@ -566,7 +566,12 @@ export default {
       const filterFeature = this.all_features.filter((feature) =>
         feature.label.toLowerCase().includes(this.feature_input.toLowerCase())
       );
-      this.all_features = filterFeature;
+      // this.all_features = filterFeature;
+      // 假设 allFeatures 和 filterFeature 是两个数组对象
+
+      // 将过滤后的数据添加到原始数据的最前面
+      this.all_features = filterFeature.concat(this.all_features.filter(item => !filterFeature.includes(item)));
+      console.log(this.all_features);
     },
     clear_feature() {
       this.feature_input = "";

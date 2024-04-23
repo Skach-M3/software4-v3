@@ -128,10 +128,14 @@
         <el-table-column label="可上传容量（MB）" width="250" align="center">
           <template slot-scope="scope">
             <div v-show="scope.row.editing">
-              <el-input v-model="scope.row.uploadSize" size="small"></el-input>
+              <el-input v-model="scope.row.allSize" size="small"></el-input>
             </div>
             <div v-show="!scope.row.editing">
-              {{ scope.row.uploadSize }}
+              <div >
+                {{ scope.row.uploadSize }}MB/
+              {{ scope.row.allSize }}MB
+              </div>
+              <el-progress :text-inside="true" :stroke-width="15" :percentage="calRate(scope.row.uploadSize,scope.row.allSize)"></el-progress>
             </div>
           </template>
         </el-table-column>
@@ -398,7 +402,7 @@ export default {
         uid: row.uid,
         status: row.selectStatus,
         role: row.selectRole,
-        uploadSize: row.uploadSize,
+        allSize: row.allSize,
       };
       console.log('row.selectStatus',row.selectStatus)
       postRequest("user/updateStatus", params).then((res) => {
@@ -520,6 +524,17 @@ export default {
       });
     },
 
+    calRate(used,all) {
+      const rate = (100*(used / all)).toFixed(0)-0;
+      if(rate > 100){
+        return 100
+      }else if (rate < 0){
+        return 0
+      }else {
+        return rate;
+      }
+    }
+
     // getInfoUser(uid) {
     //   getRequest(`user/getInfo/${uid}`).then((res) => {
     //     if (res.code == 200) {
@@ -569,4 +584,5 @@ export default {
   display: flex;
   justify-content: center;
 }
+.el-progress{width:100%;}
 </style>
