@@ -1,5 +1,18 @@
 <template>
   <div id="mainBox">
+    <div class="task_i" v-if="moduleName == 'disFactor'">
+      <h3 class="task_title">疾病危险因素挖掘：</h3>
+      <div class="task_itext">该挖掘任务旨在挖掘<b>某个疾病相关的危险因素</b>，通过选择<b>一个标签特征</b>和<b>多个相关特征</b>参与运算，挖掘出与该标签特征相关的其他特征。</div>
+    </div>
+    
+    <div class="task_i" v-if="moduleName == 'f_Factor'">
+      <h3 class="task_title">危险因素关系挖掘：</h3>
+      <div class="task_itext">该挖掘任务旨在挖掘<b>危险因素之间</b>的关联关系，通过选择<b>多个目标特征</b>和<b>多个相关特征</b>参与运算，挖掘出这些特征之间的关联关系。</div>
+    </div>
+    <div class="task_i" v-if="moduleName == 'factorDis'">
+      <h3 class="task_title">危险因素与多病种关系挖掘：</h3>
+      <div class="task_itext">该挖掘任务旨在挖掘<b>与某些危险因素相关的疾病</b>有哪些，只能使用提前打好标签的<b>多病种数据集</b>，通过选择<b>多个特征</b>和<b>多个疾病标签</b>参与运算，挖掘出与该特征相关的疾病。</div>
+    </div>
     <el-form
       ref="taskInfoForm"
       :model="taskInfoForm"
@@ -120,6 +133,19 @@ export default {
 /* #mainBox{
   overflow: auto;
 } */
+.task_i {
+  background-color: #e8f3ff;
+  height: 50px;
+  width: 100%;
+  margin-bottom: 20px;
+  margin-top: -20px;
+}
+.task_i .task_title {
+  margin-left: 2em;
+}
+.task_i .task_itext {
+  margin-left: 4.7em;
+}
 .form {
   width: 80vh;
   margin: auto;
