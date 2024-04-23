@@ -17,13 +17,13 @@
       },
       data(){
         return {
-          url: 'http://10.16.127.122:8186/software4intro.pdf' //设置文档网络地址，可以是相对地址
+          url: '' //设置文档网络地址，可以是相对地址
         }
       },
-      // created(){
-      //   getRequest("/file/getIntroFile").then((res) => {
-      //     this.url = res
-      //   });
-      // }
+      created(){
+        getRequest("/file/getIntroFile").then((res) => {
+          this.url = res
+        });
+      }
     }
     </script>
