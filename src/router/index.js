@@ -23,6 +23,8 @@ import DisSetting from "@/components/tab/manager/DisSetting.vue";
 import LogManage from "@/components/tab/manager/LogManage.vue";
 import SoftwareIntro from "@/components/tab/SoftwareIntro.vue";
 import Operation from "@/components/tab/Operation.vue";
+import updatePassword from "@/components/tab/updatePassword.vue";
+import userCenter from "@/components/tab/userCenter.vue";
 Vue.use(VueRouter)
 
 const routes = [
@@ -77,6 +79,18 @@ const routes = [
         name: "dataManage",
         component: dataManage,
         meta: { roles: ['1', '0'] },
+      },
+      {
+        path: "/updatePassword",
+        name: "updatePassword",
+        component: updatePassword,
+        meta: { roles: ['0'] },
+      },
+      {
+        path: "/userCenter",
+        name: "userCenter",
+        component: userCenter,
+        meta: { roles: ['0'] },
       },
       {
         path: "/AdminDataManage",
