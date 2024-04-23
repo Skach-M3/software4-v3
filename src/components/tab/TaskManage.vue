@@ -15,15 +15,25 @@
       <hr class="hr-dashed" />
       <el-input placeholder="输入关键字进行过滤" v-model="filterText">
       </el-input>
-      <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
-        :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
+      <div class="treeArea">
+        <el-tree ref="tree" :data="treeData" :show-checkbox="false" node-key="id" default-expand-all
+        :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
         :filter-node-method="filterNode">
-        <span class="custom-tree-node" slot-scope="{ node, data }">
-          <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
-            }}</span>
-          <span v-else>{{ node.label }}</span>
-        </span>
-      </el-tree>
+          <span class="custom-tree-node" slot-scope="{ node, data }">
+            <span class="left_span">
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"
+              ></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID" style="color: rgb(40, 207, 18);"
+              ></i>
+              <span v-if="data.catLevel == 2" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+                }}</span>
+              <span v-else :class="{'nodeLabel': node.label.length <= 15, 'scrolling-nodeLabel': node.label.length > 15}">{{ node.label }}
+                <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
+              </span>
+            </span>
+          </span>
+        </el-tree>
+      </div>
       <!-- <el-dialog title="提示" :visible.sync="dialogDiseaseVisible" width="30%">
         <span>
           请输入新病种名称：<el-input
@@ -244,7 +254,7 @@ export default {
     },
     getCatgory() {
       getCategory("/api/Taskcategory").then((response) => {
-        this.treeData = response.data;
+        this.treeData = response.data[0].children;
         // 获取病种和数据集总数
         this.diseaseNum =
           response.data[0].children.length;
@@ -266,11 +276,16 @@ export default {
 
 .left_tree {
   display: inline-block;
-  height: 99%;
+  height: 820px;
   border-radius: 3px;
   border: 1px solid #e6e6e6;
   overflow: auto;
   /* width: 250px; */
+}
+
+.treeArea{
+  height: calc(820px - 93px);/* 93px是头部信息和按钮的高度 */
+  overflow: auto;
 }
 
 .tipInfo {
@@ -311,7 +326,43 @@ h3 {
   justify-content: space-between;
   font-size: 14px;
   padding-right: 8px;
+  overflow: hidden;
 }
+
+.custom-tree-node .left_span{
+  width: 15em;
+  overflow: hidden;
+}
+
+.nodeLabel, .scrolling-nodeLabel{
+  display: inline-block;
+  white-space: nowrap;  /* 禁止文本换行 */
+  box-sizing: border-box;  /* 边框和内填充的宽度也包含在width内 */
+}
+
+.scrolling-nodeLabel:hover{
+  position: relative;
+  overflow: hidden;
+  vertical-align: text-bottom;
+  animation: scrollText 3s linear infinite;  /* 动画持续时间和循环方式 */
+}
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0px);
+  }
+  12% {
+    transform: translateX(0px);
+  }
+  75% {
+    transform: translateX(calc(-100% + 15em));
+  }
+  100% {
+    transform: translateX(calc(-100% + 15em));
+  }
+}
+
+
 
 #top_buttons {
   margin-left: 3%;

@@ -9,30 +9,50 @@
         </div>
         <hr class="hr-dashed" />
         <el-tree ref="tree" :data="treeData1" v-if="treeData1.length>0" :show-checkbox="false" node-key="id" default-expand-all
-          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
-          @check="changeData" @check-change="handleCheckChange">
+          :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
+          :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
-              }}</span>
-            <span v-else>{{ node.label }}</span>
+            <span  class="left_span">
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"
+              ></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID" style="color: rgb(40, 207, 18);"
+              ></i>
+              <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+                }}</span>
+              <span v-else :class="{'nodeLabel': node.label.length <= 10, 'scrolling-nodeLabel': node.label.length > 10}">{{ node.label }}
+                <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
+              </span>
+            </span>
           </span>
         </el-tree>
         <el-tree ref="tree" :data="treeData2" v-if="treeData2.length>0" :show-checkbox="false" node-key="id" default-expand-all
-          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
-          @check="changeData" @check-change="handleCheckChange">
+          :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
+          :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
-              }}</span>
-            <span v-else>{{ node.label }}</span>
+            <span  class="left_span">
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"
+              ></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID" style="color: rgb(40, 207, 18);"
+              ></i>
+              <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+                }}</span>
+              <span v-else :class="{'nodeLabel': node.label.length <= 10, 'scrolling-nodeLabel': node.label.length > 10}">{{ node.label }}
+                <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
+              </span>
+            </span>
           </span>
         </el-tree>
         <el-tree ref="tree" :data="treeData3" v-if="treeData3.length>0" :show-checkbox="false" node-key="id" default-expand-all
-          :expand-on-click-node="false" :check-on-click-node="true" :highlight-current="true" @node-click="changeData"
-          @check="changeData" @check-change="handleCheckChange">
+          :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
+          :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
-              }}</span>
-            <span v-else>{{ node.label }}</span>
+            <span class="left_span">
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1"
+              ></i>
+              <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
+                }}</span>
+              <span v-else :class="{'nodeLabel': node.label.length <= 10, 'scrolling-nodeLabel': node.label.length > 10}">{{ node.label }}</span>
+            </span>
           </span>
         </el-tree>
       </div>
@@ -57,7 +77,7 @@
               <i class="el-icon-finished"></i> 特征个数:<span>{{
               showDataForm.featureNum
             }}</span>
-              <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span>
+              <!-- <i class="el-icon-folder-opened"></i> 所属类别:<span>{{ showDataForm.classPath }}</span> -->
             </p>
           </div>
 
@@ -192,6 +212,13 @@ export default {
       this.$refs.list.style.transform = `translateY(${this.start * this.itemHeight
         }px)`; // 对列表项y轴偏移
     },
+
+    // 树形结构筛选方法
+    filterNode(value, data) {
+      if (!value) return true;
+      return data.label.indexOf(value) !== -1;
+    },
+
     next(classPath, name) {
       var path = classPath.split("/");
       console.log(this.tempNode);
@@ -215,12 +242,6 @@ export default {
 
     backStep() {
       this.m_changeStep(this.m_step - 1);
-    },
-
-    handleCheckChange(data, checked) {
-      if (checked) {
-        this.$refs.tree.setCheckedKeys([data.id]);
-      }
     },
 
     changeData(data) {
@@ -389,6 +410,49 @@ export default {
   border: 1px solid #e6e6e6;
 }
 
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+  overflow: hidden;
+}
+
+.custom-tree-node .left_span{
+  width: 10em;
+  overflow: hidden;
+}
+
+.nodeLabel, .scrolling-nodeLabel{
+  display: inline-block;
+  white-space: nowrap;  /* 禁止文本换行 */
+  box-sizing: border-box;  /* 边框和内填充的宽度也包含在width内 */
+}
+
+.scrolling-nodeLabel:hover{
+  position: relative;
+  overflow: hidden;
+  vertical-align: text-bottom;
+  animation: scrollText 3s linear infinite;  /* 动画持续时间和循环方式 */
+}
+
+@keyframes scrollText {
+  0% {
+    transform: translateX(0px);
+  }
+  12% {
+    transform: translateX(0px);
+  }
+  75% {
+    transform: translateX(calc(-100% + 10em));
+  }
+  100% {
+    transform: translateX(calc(-100% + 10em));
+  }
+}
+
 .tipInfo {
   background-color: rgba(124, 124, 124, 0.1);
   height: 50px;
@@ -416,11 +480,6 @@ h3 {
   position: absolute;
   overflow: auto;
   height: 100%;
-}
-
-.custom-table {
-  /* margin:0 auto; */
-  /* width: 100%; */
 }
 
 .tablePlaceholder {
