@@ -103,7 +103,7 @@
               <el-menu-item index="/SoftwareIntro">
                 软件介绍</el-menu-item
               >
-              <el-menu-item> 操作手册</el-menu-item>
+              <el-menu-item index="/Operation"> 操作手册</el-menu-item>
             </div>
           </el-menu>
         </el-aside>
