@@ -22,6 +22,7 @@ import AdminDataManage from "@/components/tab/manager/AdminDataManage.vue";
 import DisSetting from "@/components/tab/manager/DisSetting.vue";
 import LogManage from "@/components/tab/manager/LogManage.vue";
 import SoftwareIntro from "@/components/tab/SoftwareIntro.vue";
+import Operation from "@/components/tab/Operation.vue";
 Vue.use(VueRouter)
 
 const routes = [
@@ -93,6 +94,12 @@ const routes = [
         path: "/SoftwareIntro",
         name: "SoftwareIntro",
         component: SoftwareIntro,
+        meta: { roles: ['1', '0'] },
+      },
+      {
+        path: "/Operation",
+        name: "Operation",
+        component: Operation,
         meta: { roles: ['1', '0'] },
       },
       {
