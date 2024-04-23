@@ -494,7 +494,7 @@ export default {
   grid-template-columns: repeat(2, 1fr);
   column-gap: 20px;
   height: 250px;
-  width: 1660px;
+  width: 1640px;
 }
 
 .top_statistic_card_right {
@@ -515,7 +515,7 @@ export default {
 .midStatistic {
   margin-top: 10px;
   height: 550px;
-  width: 1660px;
+  width: 1640px;
 }
 
 .mid_statistic_card {

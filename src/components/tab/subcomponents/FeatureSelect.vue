@@ -100,7 +100,7 @@
         <!-- 如果要做单选框 -->
         <div class="select_feature_var" v-else>
           <div class="select_feature_var_top">
-            <h3 class="title">选择作为标签的特征(因变量)</h3>
+            <h3 class="title">选择作为标签的特征(因变量) （单选）</h3>
             <div class="searchButton">
               <el-input
                 style="width: 200px"
@@ -166,7 +166,7 @@
         <!--  选择危险因素(自变量)-->
         <div class="select_feature_var">
           <div class="select_feature_var_top">
-            <h3 class="title">选择危险因素(自变量)</h3>
+            <h3 class="title">选择多个危险因素(自变量)</h3>
           </div>
           <div class="select_feature_check_boxs">
             <el-skeleton
@@ -611,7 +611,7 @@ export default {
   /* padding-top: 5px; */
   line-height: 16px;
   vertical-align: text-bottom;
-  width: 90px;
+  width: 100px;
   overflow: hidden;
   white-space: nowrap; /* 防止文本换行 */
   text-overflow: ellipsis; /* 显示省略号 */
@@ -676,7 +676,7 @@ export default {
 .right_table {
   display: inline-block;
   height: 75vh;
-  width: 75%;
+  width: 74%;
   position: absolute;
   overflow: auto;
 }
