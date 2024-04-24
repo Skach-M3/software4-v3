@@ -67,7 +67,7 @@
             ><span class="featureTitle">特征分布：</span>
             <el-button
               type="success"
-              style="float: right; margin-right: 50px; margin-buttom: 20px"
+              style="float: right; margin-right: 50px; margin-bottom: 20px"
               @click="exportRes"
               >导出特征信息表</el-button
             >
@@ -154,7 +154,7 @@
 
 <script>
 // import FileSaver from "file-saver";
-// import XLSX from "xlsx";
+import XLSX from "xlsx";
 // import jsPDF from 'jspdf';
 // import html2canvas from 'html2canvas';
 import vuex_mixin from "@/components/mixins/vuex_mixin";
@@ -436,7 +436,7 @@ export default {
             type: "success",
             message: "任务保存成功",
           });
-          this.m_changeStep(1);
+          // this.m_changeStep(1);
           let defaultValue = {
             step: 1,
             taskName: "",
@@ -464,6 +464,18 @@ export default {
           };
           // TODO:这个改不了深层参数，需要写一个深拷贝通用方法
           this.m_changeTaskInfo(defaultValue);
+          //任务保存后，跳转到任务管理页面
+          this.$router.push("/taskManage");
+        })
+        .catch((err) => {
+          this.$message({
+            type: "error",
+            message: "新建任务失败",
+          });
+          console.log(err);
+          this.m_changeStep(this.m_step - 1);
+          return false;
+          this.$router.push("/taskManage");
         })
         .catch((err) => {
           this.$message({
@@ -478,52 +490,54 @@ export default {
     backStep() {
       this.m_changeStep(this.m_step - 1);
     },
-    exportToCSV() {
+    exportToXLSX() {
       // 将表格数据转化为CSV格式
       const csvContent = this.convertArrayOfObjectsToCSV(this.distribution);
       console.log(csvContent);
+      const ws = XLSX.utils.aoa_to_sheet(csvContent);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      XLSX.writeFile(wb, this.m_taskName+'特征分布.xlsx');
       // 创建 Blob 对象
-      const blob = new Blob([csvContent], { type: "text/csv" });
+      // const blob = new Blob([csvContent], { type: "text/csv" });
 
-      // 创建 URL
-      const url = window.URL.createObjectURL(blob);
+      // // 创建 URL
+      // const url = window.URL.createObjectURL(blob);
 
-      // 创建 a 标签
-      const link = document.createElement("a");
+      // // 创建 a 标签
+      // const link = document.createElement("a");
 
-      // 设置下载属性
-      link.href = url;
-      link.download = this.m_dataset + ".csv";
+      // // 设置下载属性
+      // link.href = url;
+      // link.download = this.m_dataset + ".csv";
 
-      // 模拟点击下载
-      link.click();
+      // // 模拟点击下载
+      // link.click();
 
-      // 释放资源
-      window.URL.revokeObjectURL(url);
+      // // 释放资源
+      // window.URL.revokeObjectURL(url);
     },
     convertArrayOfObjectsToCSV(data) {
       const csvRows = [];
       const headers = Object.keys(data[0]);
 
       // 添加表头
-      csvRows.push(headers.join(","));
+      csvRows.push(headers);
 
       // 添加表格数据
       data.forEach((row) => {
         const values = headers.map((header) => {
           const escaped = ("" + row[header]).replace(/"/g, '\\"');
-          return `"${escaped}"`;
+          return escaped;
         });
-        csvRows.push(values.join(","));
+        csvRows.push(values);
       });
 
-      // 将 CSV 行组合成 CSV 文本
-      const csvText = csvRows.join("\n");
-      return csvText;
+      return csvRows;
     },
 
     async exportRes() {
-      this.exportToCSV();
+      this.exportToXLSX();
       // const divsToExport = ['pdf_graph'];
       // const pdf_positions = [
       //   { x: 5, y: 10 }

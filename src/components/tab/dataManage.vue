@@ -385,7 +385,7 @@
         </el-checkbox-group>
         <span slot="footer" class="dialog-footer">
           <el-button @click="handleCloseCSV">取 消</el-button>
-          <el-button type="primary" @click="toCSV">确 定</el-button>
+          <el-button type="primary" @click="toXLSX">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -393,6 +393,7 @@
 </template>
 
 <script>
+import XLSX from 'xlsx';
 import { getRequest, postRequest, saveParentDisease } from "@/api/user";
 import { getFetures } from "@/api/feature.js";
 import { getCategory, addDisease, removeCate } from "@/api/category";
@@ -669,11 +670,13 @@ export default {
       this.selectedFields = [];
       this.csvDialogVisible = false;
     },
-    toCSV() {
+    toXLSX() {
       // 发送请求给后端，传递表名和选定的字段
       getRequest(`/api/getInfoByTableName/${this.showDataForm.tableName}`).then(
         (res) => {
-          const header = this.selectedFields.join(",") + "\n";
+          //二维数组 包含表头以及每一行数据
+          const final_data = [];
+          final_data.push(this.selectedFields);
           const data = res.data;
           // 构建数据行
           const rows = data
@@ -682,30 +685,16 @@ export default {
                 return this.formatCSVValue(row[field]);
               });
               return values.join(",");
-            })
-            .join("\n");
-
-          // 合并表头和数据行
-          const csvContent = header + rows;
-          console.log(csvContent);
-          // 创建 Blob 对象
-          const blob = new Blob([csvContent], { type: "text/csv" });
-
-          // 创建 URL
-          const url = window.URL.createObjectURL(blob);
-
-          // 创建 a 标签
-          const link = document.createElement("a");
-
-          // 设置下载属性
-          link.href = url;
-          link.download = this.showDataForm.tableName + ".csv";
-
-          // 模拟点击下载
-          link.click();
-
-          // 释放资源
-          window.URL.revokeObjectURL(url);
+            });
+            rows.forEach(row => {
+              //将每一行数据转换为列表
+              row = row.split(",");
+              final_data.push(row);
+          });
+          const ws = XLSX.utils.aoa_to_sheet(final_data);
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+          XLSX.writeFile(wb, this.showDataForm.tableName+'.xlsx');
           this.csvDialogVisible = false;
           this.selectedFields = [];
         }
