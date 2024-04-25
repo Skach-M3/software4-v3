@@ -253,9 +253,9 @@ export default {
       tempNode.name = this.res.targetcolumn[i];
       tempNode.x = ref_x_t * i;
       tempNode.y = bottom_y;
-      if (this.res.res[i].length > 0 && this.res.res[i].length <= 2) {
+      if (this.res.res[i]?.length > 0 && this.res.res[i]?.length <= 2) {
         tempNode.color = "#7B68EE";
-      } else if (this.res.res[i].length >= 3) {
+      } else if (this.res.res[i]?.length >= 3) {
         tempNode.color = "#000080";
       } else {
         tempNode.color = "#c2b8fae1";

@@ -101,7 +101,7 @@
           <div class="editButton">
             <el-button size="mini" type="primary" @click="handleCheck(item)" style="margin-right: 20px">查看</el-button>
             <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" @confirm="handleDelete(item)">
-              <el-button slot="reference" size="mini" type="danger">删除</el-button>
+              <el-button slot="reference" size="mini" type="danger" v-if="loginUserID == item.userid || loginUserRole == '0'">删除</el-button>
             </el-popconfirm>
           </div>
         </el-card>
@@ -125,6 +125,9 @@ export default {
     ...mapGetters(["taskLeaderList", "taskDiseaseList"]),
     loginUserID() {
       return sessionStorage.getItem("userid");
+    },
+    loginUserRole() {
+      return sessionStorage.getItem("userrole");
     },
   },
   watch: {
@@ -249,6 +252,10 @@ export default {
         if (res) {
           this.total = res.data.total;
           this.currentTaskList = res.data.list;
+          console.log("item");
+          for(var i = 0; i < this.currentTaskList.length; i++){
+            console.log(this.currentTaskList[i].userid);
+          }
         }
       });
     },

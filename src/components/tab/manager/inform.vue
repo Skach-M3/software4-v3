@@ -52,7 +52,7 @@
         >
         </el-table-column>
         <el-table-column
-          prop="updateTime"
+          prop="showTime"
           label="最新发布时间"
           width="300"
           align="center"
@@ -206,7 +206,9 @@ export default {
         if (res) {
           const dataWithEditing = res.list.map((item) => ({
             ...item,
-            updateTime: this.convertToBeijingTime(item.updateTime), // 格式化时间为北京时间
+            // updateTime: this.convertToBeijingTime(item.updateTime), // 格式化时间为北京时间
+            updateTime: item.updateTime,
+            showTime: this.convertToBeijingTime(item.updateTime),
             editing: false,
           }));
 

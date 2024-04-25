@@ -411,7 +411,7 @@ export default {
         ci: this.m_result?.ci,
         res: this.m_result?.res,
         dataset: this.m_dataset,
-        uid: sessionStorage.getItem("userid") - 0,
+        uid: sessionStorage.getItem("userid"),
         tasktype: this.moduleName,
       };
       let alghName = "m_" + this.m_algorithm;
