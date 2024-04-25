@@ -28,7 +28,7 @@
       </div>
       <div class="right_table">
         <div class="specify">
-          <p>特征下方进度条为特征填充度</p>
+          <p>特征下方进度条为特征完备率</p>
         </div>
 
         <!-- 选择作为标签的特征(因变量) -->

@@ -39,7 +39,7 @@
               <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
                 cancel-button-text="取消" @confirm="() => remove(node, data)">
                 <el-button v-if="(data.isLeafs == 1 && data.status == 0) ||
-                (data.uid == loginUserID && data.status != 2)
+                (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
                 " icon="el-icon-delete" size="mini" type="text" slot="reference">
                 </el-button>
               </el-popconfirm>
@@ -76,7 +76,7 @@
               <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
                 cancel-button-text="取消" @confirm="() => remove(node, data)">
                 <el-button v-if="(data.isLeafs == 1 && data.status == 0) ||
-            (data.uid == loginUserID && data.status != 2)
+            (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
             " icon="el-icon-delete" size="mini" type="text" slot="reference">
                 </el-button>
               </el-popconfirm>

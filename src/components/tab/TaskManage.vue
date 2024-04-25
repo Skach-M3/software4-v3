@@ -76,9 +76,9 @@
             新建任务<i class="el-icon-arrow-down el-icon--right"></i>
           </el-button>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="/sideBar/DisFactor">疾病危险因素挖掘</el-dropdown-item>
-            <el-dropdown-item command="/sideBar/F_Factor">危险因素相关因素挖掘</el-dropdown-item>
-            <el-dropdown-item command="/sideBar/FactorDis">危险因素相关疾病挖掘</el-dropdown-item>
+            <el-dropdown-item command="/DisFactor">疾病危险因素挖掘</el-dropdown-item>
+            <el-dropdown-item command="/F_Factor">危险因素相关因素挖掘</el-dropdown-item>
+            <el-dropdown-item command="/FactorDis">危险因素相关疾病挖掘</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
