@@ -50,7 +50,12 @@
               </el-table-column>
               <el-table-column prop="createTime" label="创建时间" width="150">
               </el-table-column>
-              <el-table-column prop="tableStatus" label="数据表状态" width="100">
+              <el-table-column label="数据表状态" width="100">
+                <template slot-scope="props">
+                    <span v-if="props.row.tableStatus==0">私有</span>
+                    <span v-if="props.row.tableStatus==1">共享</span>
+                    <span v-if="props.row.tableStatus==2">公有</span>
+                </template>
               </el-table-column>
               <el-table-column prop="tableSize" label="数据表大小" width="100">
               </el-table-column>
