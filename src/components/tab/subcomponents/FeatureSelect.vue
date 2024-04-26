@@ -534,6 +534,7 @@ export default {
       }
       this.checked_dependent_variables = [];
       this.checked_independent_variables = [];
+      this.know_variables = [];
     },
     isEqual(obj1, obj2) {
       if (obj1.name === obj2.name && obj1.status === obj2.status) {
