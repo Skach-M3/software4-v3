@@ -307,6 +307,8 @@ export default {
                 }
               }else if(resp.code == "400"){
                 this.$message.warning("您的账号待激活，请等待管理员处理");
+              }else if(resp.code == "500"){
+                this.$message.warning(resp.msg);
               }
             } else {
               this.$message.error("用户不存在或者密码错误");

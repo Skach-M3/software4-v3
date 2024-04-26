@@ -244,7 +244,6 @@ export default {
 
 .paramBox .el-form .el-input {
   width: 25vh;
-  margin-top: -50px;
 }
 
 .paramTitle {

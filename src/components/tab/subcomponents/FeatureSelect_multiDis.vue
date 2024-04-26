@@ -333,9 +333,9 @@ export default {
         return;
       }
       this.m_changeTaskInfo({
-        use_features: this.computeFeatures,
-        known_features: this.knownFeatures,
-        target_feature: this.targetFeature,
+        caculate_use_features: this.computeFeatures,
+        caculate_known_features: this.knownFeatures,
+        caculate_target_feature: this.targetFeature,
       });
       this.m_changeStep(this.m_step + 1);
     },

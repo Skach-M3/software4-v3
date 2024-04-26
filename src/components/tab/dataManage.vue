@@ -29,8 +29,14 @@
             </span>
             
             <span>
-              <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
+              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
                 cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
+                  type="text" slot="reference" @click="markNode(data)">
+                </el-button>
+              </el-popconfirm>
+              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集"
+                @confirm="importData">
                 <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
                   type="text" slot="reference" @click="markNode(data)">
                 </el-button>
@@ -66,8 +72,14 @@
             </span>
             
             <span>
-              <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
+              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
                 cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
+                  type="text" slot="reference" @click="markNode(data)">
+                </el-button>
+              </el-popconfirm>
+              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集"
+                @confirm="importData">
                 <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
                   type="text" slot="reference" @click="markNode(data)">
                 </el-button>
@@ -225,7 +237,7 @@
         </div>
         <!-- 显示筛选出来的表数据 -->
         <el-table :data="addTableData" stripe style="width: 100%" height="450" v-show="showAddTableData"
-          :header-cell-style="{ background: '#eee', color: '#606266' }">
+          :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading" element-loading-text="正在抽取数据">
           <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
             sortable>
             <template slot-scope="{ row }">
@@ -399,7 +411,7 @@ import { getFetures } from "@/api/feature.js";
 import { getCategory, addDisease, removeCate } from "@/api/category";
 import { getTableDes, getTableData } from "@/api/tableDescribe.js";
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
-import { resetForm, debounce, tabSwitch } from "@/components/mixins/mixin.js";
+import { resetForm, debounce } from "@/components/mixins/mixin.js";
 let id = 1000;
 
 export default {
@@ -516,6 +528,7 @@ export default {
           },
         ],
       },
+      addDataLoading: false,
       characterOptList: [],
       addTableData: [],
       input3: "",
@@ -1089,8 +1102,11 @@ export default {
       this.characterOptItem = item;
     },
     submitCharacterCondition() {
-      console.log("this.addDataForm.characterList");
-      console.log(this.addDataForm.characterList);
+      // console.log("this.addDataForm.characterList");
+      // console.log(this.addDataForm.characterList);
+      this.showAddTableData = true;
+      this.addDataLoading = true;
+      
       let filterConditions = {};
       filterConditions.addDataForm = this.addDataForm;
       filterConditions.nodeData = this.nodeData;
@@ -1102,17 +1118,19 @@ export default {
           "Content-Type": "application/json",
         },
       };
-      console.log("请求参数：" + JSON.stringify(filterConditions));
+      // console.log("请求参数：" + JSON.stringify(filterConditions));
       this.$axios(this.options)
         .then((res) => {
           this.addTableData = res.data;
-          console.log("数据:");
-          console.log(this.addTableData);
-          this.showAddTableData = true;
+          // console.log("数据:");
+          // console.log(this.addTableData);
+          // this.showAddTableData = true;
+          this.addDataLoading = false;
         })
         .catch((error) => {
           this.$message.error("获取数据失败");
           console.log("获取数据失败" + error);
+          this.addDataLoading = false;
         });
       let s = JSON.stringify(this.addDataForm.characterList, null, 2);
       console.log("this.addDataForm:");
