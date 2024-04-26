@@ -234,7 +234,7 @@ export default {
     let tempLink = {
       source: "",
       target: "",
-      value: 1,
+      value: '',
       label: {
         show: true,
       },
@@ -290,7 +290,7 @@ export default {
         tempLink.source = this.res.targetcolumn[i];
         tempLink.target = this.res.res[i][j];
         // 权重是随机数
-        tempLink.value = Number(Math.random().toFixed(3));
+        // tempLink.value = Number(Math.random().toFixed(3));
         tempLink.lineStyle.width = 3 + tempLink.value * 8;
         this.links.push(JSON.parse(JSON.stringify(tempLink)));
       }

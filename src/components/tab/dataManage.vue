@@ -304,7 +304,7 @@
 
       <!-- 解析表后字段分类弹窗 -->
       <el-dialog v-loading="loading2" :element-loading-text="loadText2" append-to-body title="请选择多个疾病标签字段"
-        :visible.sync="featuresVision">
+        :visible.sync="featuresVision" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
         <!-- <el-form class="featureLabel" label-width="auto"> -->
         <el-checkbox-group v-model="labelList">
           <el-checkbox style="width: 250px" border v-for="(name, index) in Object.keys(featuresMap)" :key="index"
@@ -399,7 +399,7 @@ import { getFetures } from "@/api/feature.js";
 import { getCategory, addDisease, removeCate } from "@/api/category";
 import { getTableDes, getTableData } from "@/api/tableDescribe.js";
 import { mapGetters, mapMutations, mapState, mapActions } from "vuex";
-import { resetForm, debounce } from "@/components/mixins/mixin.js";
+import { resetForm, debounce, tabSwitch } from "@/components/mixins/mixin.js";
 let id = 1000;
 
 export default {
@@ -581,7 +581,11 @@ export default {
       fields: [],
       labelList: [],
       table_loading: false,
-      filterText: ''
+      filterText: '',
+      compelete_node:{},
+      compelete_userId:'',
+      compelete_size:'',
+      compelete_tableDescribe:{}      
     };
   },
 
@@ -615,7 +619,7 @@ export default {
     }, 200);
     this.checkTableName = this.debounce(() => {
       getRequest("/api/DataTable/inspection", {
-        newname: this.addDataForm.dataName,
+        newname: this.dialogForm.tableName,
       }).then((res) => {
         console.log(res);
         // 上一次重复了这一次不重复就要提醒一下
@@ -715,10 +719,13 @@ export default {
     compelete() {
       // 判断多标签合理性，并填写上传payload
       let labelCount = 0;
-
       const payload_feature = {
         tableName: this.dialogForm.tableName,
         tableHeaders: [],
+        userID:this.compelete_userId,
+        node:this.compelete_node,
+        size:this.compelete_size,
+        tableDescribe:this.compelete_tableDescribe
       };
       for (const key in this.featuresMap) {
         if (Object.hasOwnProperty.call(this.featuresMap, key)) {
@@ -836,7 +843,12 @@ export default {
             type: "success",
             message: "解析成功",
           });
-          let featureList = res.data;
+          let featureList = res.data.featureList;
+          this.compelete_userId = res.data.userId;
+          this.compelete_node = res.data.node;
+          this.compelete_size = res.data.size;
+          this.compelete_tableDescribe = res.data.tableDescribe;
+          console.log(featureList);
           //把特征存为map的键
           for (const item of featureList) {
             this.$set(this.featuresMap, item, "diagnosis");
@@ -885,6 +897,7 @@ export default {
           this.loadText = "正在上传并解析文件";
           this.loading = true;
           this.$refs.uploadRef.submit();
+          // this.resetForm('dialogFormRef');
         }
       });
     },
