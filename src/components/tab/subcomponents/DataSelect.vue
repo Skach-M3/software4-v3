@@ -4,8 +4,13 @@
       <div class="left_tree">
         <div class="tipInfo">
           <h3>可选数据</h3>
-          <span class="statistic"> 一级病种: {{ diseaseNum }} 个 </span>
-          <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
+          <div v-if="moduleName == 'factorDis'">
+            <span class="statistic"> 仅可选择多疾病数据集 </span>
+          </div>
+          <div v-else>
+            <span class="statistic"> 一级病种: {{ diseaseNum }} 个 </span>
+            <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
+          </div>
         </div>
         <hr class="hr-dashed" />
         <el-input placeholder="输入关键字进行过滤" v-model="filterText">
