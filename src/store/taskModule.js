@@ -24,7 +24,8 @@ export default {
       },
       result: [],
       is_common:false,
-      node_data:''
+      node_data:'',
+      traditional_res:{}
     };
   },
   getters: {},

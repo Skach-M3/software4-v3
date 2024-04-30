@@ -183,12 +183,23 @@ export default {
           if (isNaN(res.data.ratio)) {
             console.log("ration:");
             res.data.ratio = 0;
-            console.log(res.ratio);
           }
           this.m_changeTaskInfo({ algorithm: this.model, result: res.data });
           this.loading = false;
-          console.log(this.m_result);
           this.m_changeStep(this.m_step + 1);
+        })
+        .catch((err) => {
+          this.loading = false;
+          this.$message({
+            showClose: true,
+            type: "error",
+            message: `发生错误：${err}`,
+          });
+        });
+
+        postRequest("/runtime_bus/traditional_statistic", payload)
+        .then((res) => {
+          this.m_changeTaskInfo({ traditional_res: JSON.parse(res.data.res[0]) });
         })
         .catch((err) => {
           this.loading = false;

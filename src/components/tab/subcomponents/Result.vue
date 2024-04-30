@@ -136,11 +136,35 @@
             ></GraphVue>
           </div>
         </el-card>
-        <!-- <el-card style="margin-top: 0.8%;">
-          <div class="treeBox">
-            <Tree v-if="initFlag" :title_text="graphTitile" :data="data"></Tree>
+
+        <el-card style="margin-top: 0.8%" shadow="never">
+          <div slot="header" class="">
+            <h2>统计方法结果:</h2>
           </div>
-        </el-card> -->
+          <div class="graphBox2">
+            <Heat
+              title_text="Pearson分析"
+              :target_list="target_list"
+              :caculate_list="caculate_list"
+              :data="pearson_list"
+              :grapgId="'pearson_list'"
+            ></Heat>
+            <Heat
+              title_text="Spearman分析"
+              :target_list="target_list"
+              :caculate_list="caculate_list"
+              :data="spearman_list"
+              :grapgId="'spearman_list'"
+            ></Heat>
+            <Heat
+              title_text="Kendall分析"
+              :target_list="target_list"
+              :caculate_list="caculate_list"
+              :data="kendall_list"
+              grapgId="kendall_list"
+            ></Heat>
+          </div>
+        </el-card>
       </el-card>
     </div>
 
@@ -159,6 +183,7 @@ import XLSX from "xlsx";
 // import html2canvas from 'html2canvas';
 import vuex_mixin from "@/components/mixins/vuex_mixin";
 import GraphVue from "./Graph.vue";
+import Heat from "./Heat.vue";
 // import Tree from "./Tree.vue";
 import { postRequest } from "@/api/user";
 import { mapMutations } from "vuex";
@@ -170,6 +195,7 @@ export default {
   components: {
     GraphVue,
     // Tree,
+    Heat
   },
   props: {
     moduleName: {
@@ -194,10 +220,37 @@ export default {
       type: "",
       distribution: [],
       haveResult: true,
+      target_list:[],
+      pearson_list:[],
+      caculate_list:[],
+      spearman_list:[],
+      kendall_list:[]
     };
   },
 
   created() {
+    console.log(this.m_traditional_res);
+    var Correlation_Results =(this.m_traditional_res["Correlation Results"])
+    this.target_list = this.m_caculate_target_feature;
+    this.caculate_list = this.m_caculate_use_features;
+    for (let i = 0; i < this.target_list.length; i++) {
+      for(let j=0; j< this.caculate_list.length;j++){
+        var temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Pearson"]]
+        this.spearman_list.push(temp_arry)
+      }  
+    }
+    for (let i = 0; i < this.target_list.length; i++) {
+      for(let j=0; j< this.caculate_list.length;j++){
+        var temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Kendall"]]
+        this.pearson_list.push(temp_arry)
+      }  
+    }
+    for (let i = 0; i < this.target_list.length; i++) {
+      for(let j=0; j< this.caculate_list.length;j++){
+        var temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Spearman"]]
+        this.kendall_list.push(temp_arry)
+      }  
+    }
     let tempNode = {
       name: this.m_caculate_target_feature[0],
       x: 300,
@@ -617,10 +670,16 @@ h3 {
   margin-right: 15%;
 }
 
-.graphBox {
+.graphBox,.graphBox2 {
   width: 100%;
   height: 40vh;
   margin-top: 20px;
+}
+
+.graphBox2{
+  display: grid;
+  grid-template-columns: repeat(3,540px);
+  justify-content: space-evenly;
 }
 
 .treeBox {

@@ -61,6 +61,9 @@ export default {
     m_caculate_target_feature() {
       return this.$store.state[this.moduleName].caculate_target_feature;
     },
+    m_traditional_res() {
+      return this.$store.state[this.moduleName].traditional_res;
+    },
   },
   methods: {
     m_changeStep(newStep) {
