@@ -6,6 +6,8 @@
         <span class="statistic"> 一级病种: {{ diseaseNum }} 个 </span>
         <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
       </div>
+      <el-button style="width: 100%;" @click="uploadDataDialogVisible = true; getDataDiseases()"> <i
+          class="el-icon-circle-plus-outline"></i> 上传数据 </el-button>
       <hr class="hr-dashed" />
       <el-input placeholder="输入关键字进行过滤" v-model="filterText">
       </el-input>
@@ -24,9 +26,9 @@
               <span v-else
                 :class="{ 'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12 }">{{
           node.label }}
-          <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
+                <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
               </span>
-          </span>
+            </span>
 
             <span>
               <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集"
@@ -320,8 +322,8 @@
         <el-button @click="
           dialogFormVisible = false;
         resetForm('dialogFormRef');
-        share_uid_list=[];
-        share_username='';
+        share_uid_list = [];
+        share_username = '';
         ">取消</el-button>
         <el-button @click="resetForm('dialogFormRef')">重置</el-button>
         <el-button type="primary" @click="uploadFile">确定</el-button>
@@ -340,6 +342,61 @@
         </div>
       </el-dialog>
     </el-dialog>
+
+    <!--===============================     添加数据表单   ===================================================================-->
+    <el-dialog v-loading="loading" :element-loading-text="loadText" id="importDataTable" title="导入数据表"
+      :visible.sync="uploadDataDialogVisible" width="40%">
+      <el-form :model="dialogForm" ref="dialogFormRef" :rules="dialogForm.rules" label-width="110px">
+        <el-form-item label="选择数据表" prop="filesInfo">
+          <el-upload action="" class="upload" ref="userUploadRef" :on-preview="handlePreview" :on-remove="handleRemove"
+            :on-change="changeuserUploadFile" :auto-upload="false" accept=".csv" :limit="1" :multiple="false"
+            :file-list="dialogForm.filesInfo" :http-request="(data) => {
+          userUpRequest(data);
+        }
+          ">
+            <el-button slot="trigger" size="small" type="success">选取文件</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传csv文件</div>
+          </el-upload>
+        </el-form-item>
+
+        <el-form-item label="数据表名称" prop="tableName">
+          <el-input v-model="dialogForm.tableName" placeholder="请输入数据表名称"></el-input>
+        </el-form-item>
+        <el-form-item label="请选择病种">
+          <div class="block">
+            <el-cascader :options="disOptions" :props="{ checkStrictly: true }" v-model="selectedOptions"
+              @change="handleCascaderChange"></el-cascader>
+          </div>
+        </el-form-item>
+
+        <el-form-item label="是否共享">
+          <div class="block">
+            <el-switch v-model="is_share" active-color="#13ce66" inactive-color="#ff4949" @change="is_share_change()">
+            </el-switch>
+          </div>
+        </el-form-item>
+
+      </el-form>
+
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog()">取 消</el-button>
+        <el-button type="primary" @click="userUploadFile">确 定</el-button>
+      </div>
+
+      <!-- 多疾病新增 -->
+      <el-dialog v-loading="loading2" :element-loading-text="loadText2" append-to-body title="请选择多个疾病标签字段"
+        :visible.sync="featuresVision" :show-close="false" :close-on-click-modal="false" :close-on-press-escape="false">
+        <!-- <el-form class="featureLabel" label-width="auto"> -->
+        <el-checkbox-group v-model="labelList">
+          <el-checkbox style="width: 250px" border v-for="(name, index) in Object.keys(featuresMap)" :key="index"
+            :label="name"></el-checkbox>
+        </el-checkbox-group>
+        <div slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="compelete">完成上传</el-button>
+        </div>
+      </el-dialog>
+    </el-dialog>
+
     <div class="right_table">
       <el-card class="right_table_topCard" :body-style="{ height: '850px' }">
         <div style="height: 30px; padding-left: 5px">
@@ -365,11 +422,13 @@
             showDataForm.classPath
           }}</span> -->
             <el-button type="success" size="mini" class="change_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '0'" @click="TableshareUserSelectDialog = true">转为共享</el-button>
+              v-if="nodeData.uid === loginUserID && nodeData.status == '0'"
+              @click="TableshareUserSelectDialog = true">转为共享</el-button>
             <el-button type="success" size="mini" class="change_btn"
               v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeToPrivate()">转为私有</el-button>
-              <el-button type="warning" size="mini" class="change_status_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeShareStatus()">更改共享人员</el-button>
+            <el-button type="warning" size="mini" class="change_status_btn"
+              v-if="nodeData.uid === loginUserID && nodeData.status == '1'"
+              @click="changeShareStatus()">更改共享人员</el-button>
             <el-button type="primary" @click="csvDialogVisible = true" size="mini" v-if="showDataForm.tableName"
               class="csv_btn">导出数据</el-button>
           </p>
@@ -428,8 +487,8 @@
         </div>
       </el-dialog>
 
-            <!-- 单独表进行共享用户对话框 -->
-            <el-dialog title="请选择要共享的用户" :visible.sync="TableshareUserSelectDialog" width="40%">
+      <!-- 单独表进行共享用户对话框 -->
+      <el-dialog title="请选择要共享的用户" :visible.sync="TableshareUserSelectDialog" width="40%">
         <div style="text-align: center">
           <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
             filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
@@ -440,8 +499,8 @@
         </div>
       </el-dialog>
 
-                  <!-- 单独表进行共享用户更改对话框 -->
-                  <el-dialog title="请进行共享用户更改" :visible.sync="TableshareUserChangeDialog" width="40%">
+      <!-- 单独表进行共享用户更改对话框 -->
+      <el-dialog title="请进行共享用户更改" :visible.sync="TableshareUserChangeDialog" width="40%">
         <div style="text-align: center">
           <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
             filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
@@ -655,9 +714,14 @@ export default {
       all_uid_list: [],
       share_uid_list: [],
       shareUserSelectDialog: false,
-      share_username:'',
-      TableshareUserSelectDialog:false,
-      TableshareUserChangeDialog:false
+      share_username: '',
+      TableshareUserSelectDialog: false,
+      TableshareUserChangeDialog: false,
+      uploadDataDialogVisible: false,
+      disOptions: [],
+      selectedOptions: [],
+      is_share: false,
+      pid: '',
     };
   },
 
@@ -898,9 +962,9 @@ export default {
         url: "api/dataTable/upload",
         headers: {
           "Content-Type": "multipart/form-data",
-          "uid":this.loginUserID,
-          "username":sessionStorage.getItem("username"),
-          "role":sessionStorage.getItem("userrole")
+          "uid": this.loginUserID,
+          "username": sessionStorage.getItem("username"),
+          "role": sessionStorage.getItem("userrole")
         },
       };
       // 多疾病下的上传文件需要打标签，用不同的接口
@@ -944,13 +1008,171 @@ export default {
         }
       });
     },
+
+    userUpRequest(data) {
+      if (this.selectedOptions.length < 1) {
+        this.$message({
+          type: "warning",
+          message: "请选择该数据表应该属于什么病种",
+        });
+        return;
+      }
+      if (this.selectedOptions.length === 1 && this.selectedOptions[0] === '14') {
+        console.log("开始上传文件");
+        const payload = new FormData();
+        const fileSize = data.file.size;
+
+        const fileSizeInMB = (fileSize / 100000).toFixed(2)
+        payload.append("file", data.file);
+        payload.append("newName", this.dialogForm.tableName);
+        payload.append("disease", "多疾病");
+        payload.append("user", sessionStorage.getItem("username"));
+        payload.append("uid", sessionStorage.getItem("userid"));
+        payload.append("parentId", this.selectedOptions[0]);
+        payload.append("parentType", "多疾病");
+        if (this.is_share == true) {
+          payload.append("status", "1");
+        } else {
+          payload.append("status", "0");
+        }
+
+        payload.append(
+          "size",
+          fileSizeInMB
+        );
+        payload.append("is_upload", "1");
+        payload.append("is_filter", "0");
+        payload.append("uid_list", this.uid_list);
+        this.options = {
+          method: "post",
+          data: payload,
+          url: "api/dataTable/parseAndUpload",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+        this.$axios(this.options).then((res) => {
+          console.log(this.options.data.get("uid"));
+          // 返回表头信息
+          this.loading = false;
+          if (res?.code == "200") {
+            this.$message({
+              showClose: true,
+              type: "success",
+              message: "解析成功",
+            });
+            let featureList = res.data.featureList;
+            this.compelete_userId = res.data.userId;
+            this.compelete_node = res.data.node;
+            this.compelete_size = res.data.size;
+            this.compelete_tableDescribe = res.data.tableDescribe;
+            console.log(featureList);
+            //把特征存为map的键
+            for (const item of featureList) {
+              this.$set(this.featuresMap, item, "diagnosis");
+            }
+            this.featuresVision = true;
+            this.uploadDataDialogVisible = false;
+            this.getCatgory();
+            this.share_uid_list = [];
+            this.share_username = '';
+            this.uid_list = '';
+            this.is_share=false;
+            this.dialogForm = {
+                filesInfo: [],
+                tableName: "",
+                isOnly: true,
+                dataDisease: "",
+                featuresNum: 1,
+                fields: [{ name: "", type: "" }],
+             
+            }
+          } else {
+            this.$message({
+              showClose: true,
+              type: "error",
+              message: "解析失败",
+            });
+          }
+        });
+      }
+      else {
+        console.log("开始上传文件");
+
+        const fileSize = data.file.size;
+
+        const fileSizeInMB = (fileSize / 100000).toFixed(2)
+        console.log("fileSize", fileSize, fileSizeInMB);
+
+        const payload = new FormData();
+        payload.append("file", data.file);
+        payload.append("pid", this.pid);
+        payload.append("tableName", this.dialogForm.tableName);
+        payload.append("userName", sessionStorage.getItem("username"));
+
+        payload.append("ids", this.selectedOptions)
+
+        payload.append("uid", sessionStorage.getItem("userid"));
+        if (this.is_share == true) {
+          payload.append("tableStatus", "1");
+        } else {
+          payload.append("tableStatus", "0");
+        }
+        payload.append("tableSize", fileSizeInMB);
+        payload.append("current_uid", sessionStorage.getItem("userid"));
+        payload.append("uid_list", this.uid_list);
+        this.options = {
+          method: "post",
+          data: payload,
+          url: "/api/uploadDataTable",
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        };
+        this.$axios(this.options).then((res) => {
+          // 返回表头信息
+          this.loading = false;
+          console.log(res);
+          if (res?.code == "200") {
+            this.$message({
+              showClose: true,
+              type: "success",
+              message: "解析成功",
+            });
+
+            this.uploadDataDialogVisible = false;
+            this.getCatgory();
+            this.share_uid_list = [];
+            this.share_username = '';
+            this.uid_list = '';
+            this.is_share = false;
+            this.dialogForm = {
+                filesInfo: [],
+                tableName: "",
+                isOnly: true,
+                dataDisease: "",
+                featuresNum: 1,
+                fields: [{ name: "", type: "" }],
+           
+            }
+          } else {
+            this.$message({
+              showClose: true,
+              type: "error",
+              message: "解析失败",
+            });
+          }
+        });
+      }
+    },
+
     getCatgory() {
       getCategory(`/api/category?uid=${this.loginUserID}`).then((response) => {
         this.treeData1 = response.data.slice(0, 1);
         this.treeData2 = response.data.slice(1, 2);
         this.treeData3 = response.data.slice(2, 3);
         // 获取病种和数据集总数
-        this.filterText='';
+        this.filterText = '';
         this.diseaseNum = response.data[0].children.length;
         getRequest("/api/getTableNumber").then((res) => {
           if (res.code == 200) this.datasetNum = res.data;
@@ -975,6 +1197,28 @@ export default {
           this.loadText = "正在上传并解析文件";
           this.loading = true;
           this.$refs.uploadRef.submit();
+          // this.resetForm('dialogFormRef');
+        }
+      });
+    },
+    userUploadFile() {
+      if (this.$refs["userUploadRef"].uploadFiles.length < 1) {
+        this.$message({
+          showClose: true,
+          type: "warning",
+          message: "请选择数据表",
+        });
+        return false;
+      }
+      this.checkTableName();
+      if (!this.dialogForm.isOnly) {
+        return false;
+      }
+      this.$refs["dialogFormRef"].validate((valid) => {
+        if (valid) {
+          this.loadText = "正在上传并解析文件";
+          this.loading = true;
+          this.$refs.userUploadRef.submit();
           // this.resetForm('dialogFormRef');
         }
       });
@@ -1121,7 +1365,7 @@ export default {
     addTable() {
       // 创建表
       this.addDataForm.uid_list = this.uid_list,
-      this.diseaseName = this.addDataForm.dataName;
+        this.diseaseName = this.addDataForm.dataName;
       this.dialogDataVisible = false;
       let filterConditions = {};
       filterConditions.addDataForm = this.addDataForm;
@@ -1133,9 +1377,9 @@ export default {
         url: "api/createTable",
         headers: {
           "Content-Type": "application/json",
-          "uid":this.loginUserID,
-          "username":sessionStorage.getItem("username"),
-          "role":sessionStorage.getItem("userrole")
+          "uid": this.loginUserID,
+          "username": sessionStorage.getItem("username"),
+          "role": sessionStorage.getItem("userrole")
         },
       };
       this.$axios(this.options).then((res) => {
@@ -1340,7 +1584,14 @@ export default {
         );
       }
     },
-    compeleteShare(){
+    changeuserUploadFile() {
+      if (this.dialogForm.tableName.length < 1) {
+        this.dialogForm.tableName = this.removeFileExtension(
+          this.$refs["userUploadRef"].uploadFiles[0].name
+        );
+      }
+    },
+    compeleteShare() {
       this.uid_list = this.share_uid_list.join(",");
       postRequest("/api/category/changeToShare", {
         nodeid: this.nodeData.id,
@@ -1351,13 +1602,13 @@ export default {
           this.TableshareUserSelectDialog = false;
           this.TableshareUserChangeDialog = false;
           this.share_uid_list = [];
-          this.uid_list='';
+          this.uid_list = '';
           this.getCatgory();
         } else {
           this.$message.error("分享失败");
         }
       });
-  
+
 
     },
     changeToPrivate() {
@@ -1366,15 +1617,15 @@ export default {
         nodeid: this.nodeData.id
       })
         .then((res) => {
-        if (res.code == 200) {
-          this.$message.success("转为私有成功");
-          this.getCatgory();
-          this.getTableDescribe(this.nodeData.id, this.nodeData.label);
-          this.nodeData.status = "0";
-        } else {
-          this.$message.error("转为私有失败");
-        }
-      }).catch((error) => {
+          if (res.code == 200) {
+            this.$message.success("转为私有成功");
+            this.getCatgory();
+            this.getTableDescribe(this.nodeData.id, this.nodeData.label);
+            this.nodeData.status = "0";
+          } else {
+            this.$message.error("转为私有失败");
+          }
+        }).catch((error) => {
           console.log(error);
         });
     },
@@ -1393,45 +1644,101 @@ export default {
     filterMethod(query, item) {
       return item.label.indexOf(query) > -1;
     },
-    cancelShare(){
+    cancelShare() {
       this.shareUserSelectDialog = false;
       this.TableshareUserChangeDialog = false;
       this.TableshareUserSelectDialog = false;
       this.uid_list = '';
+      this.is_share = false;
     },
-    Share(){
+    Share() {
       this.uid_list = this.share_uid_list.join(",");
       this.shareUserSelectDialog = false;
       var username_list = [];
-      for(var user of this.all_uid_list){
-          if(this.share_uid_list.includes(user.key)){
-            username_list.push(user.label);
-          }
-      
+      for (var user of this.all_uid_list) {
+        if (this.share_uid_list.includes(user.key)) {
+          username_list.push(user.label);
+        }
+
       }
       console.log(this.uid_list);
       console.log(this.share_uid_list);
       this.share_username = username_list.join(",");
 
     },
-    changeShareStatus(){
-     this.TableshareUserChangeDialog = true;
-     postRequest("/api/category/getNodeInfo", {
+    changeShareStatus() {
+      this.TableshareUserChangeDialog = true;
+      postRequest("/api/category/getNodeInfo", {
         nodeid: this.nodeData.id,
         uid: this.loginUserID,
       })
         .then((res) => {
-        if (res.code == 200) {
-          this.$message.success("转为私有成功");
-          this.share_uid_list = res.data;
-        } else {
-          this.$message.error("转为私有失败");
-        }
-      }).catch((error) => {
+          if (res.code == 200) {
+            this.$message.success("转为私有成功");
+            this.share_uid_list = res.data;
+          } else {
+            this.$message.error("转为私有失败");
+          }
+        }).catch((error) => {
           console.log(error);
         });
-    }
+    },
+    getDataDiseases() {
+      getRequest(`/api/selectDataDiseases`).then(res => {
+        if (res.code == 200) {
+          console.log("selectDataDiseases", res.data);
+          this.disOptions = res.data;
+        } else {
+          console.logt("res", res.data)
+        }
+      })
+    },
+    is_share_change() {
+      this.shareUserSelectDialog = this.is_share;
+      if (this.is_share == false) {
+        this.cancelShare();
+      }
+    },
+    handleCascaderChange(value) {
+      // console.log('Selected Options:',value, this.selectedOptions[this.selectedOptions.length-1]);
+      // 如果你希望同时更新 dataDisease
+      this.pid = value[value.length - 1];
+      console.log(this.pid, this.dataDisease)
+    },
+    closeDialog() {
+            this.uploadDataDialogVisible = false;
+            this.dialogForm = {
+                filesInfo: [],
+                tableName: "",
+                isOnly: true,
+                dataDisease: "",
+                featuresNum: 1,
+                fields: [{ name: "", type: "" }],
+                rules: {
+                    tableName: [
+                        {
+                            required: true,
+                            message: "数据表名称不能为空",
+                            trigger: "change",
+                        },
+                    ],
+                    dataDisease: [
+                        {
+                            required: true,
+                            message: "涉及疾病不能为空",
+                            trigger: "blur",
+                        },
+                    ],
+                    numFeatures: [
+                        { required: true, message: "特征个数不能为空", trigger: "blur" },
+                        { type: "integer", message: "特征个数需为整数", trigger: "blur" },
+                        { min: 1, message: "特征个数需>1", trigger: "blur" },
+                    ],
+                },
+            }
+        },
   },
+
 };
 </script>
 
@@ -1734,7 +2041,8 @@ h3 {
   right: 10%;
   top: 5%;
 }
-.change_status_btn{
+
+.change_status_btn {
   position: absolute;
   right: 18%;
   top: 5%;
