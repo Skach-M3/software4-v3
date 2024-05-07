@@ -240,7 +240,7 @@
           </button>
         </div>
         <!-- 显示筛选出来的表数据 -->
-        <el-table :data="addTableData" stripe style="width: 100%" height="450" v-show="showAddTableData"
+        <el-table :data="addTableData" stripe style="width: 100%" height="500" v-show="showAddTableData"
           :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
           element-loading-text="正在抽取数据">
           <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
@@ -898,6 +898,9 @@ export default {
         url: "api/dataTable/upload",
         headers: {
           "Content-Type": "multipart/form-data",
+          "uid":this.loginUserID,
+          "username":sessionStorage.getItem("username"),
+          "role":sessionStorage.getItem("userrole")
         },
       };
       // 多疾病下的上传文件需要打标签，用不同的接口
@@ -1130,6 +1133,9 @@ export default {
         url: "api/createTable",
         headers: {
           "Content-Type": "application/json",
+          "uid":this.loginUserID,
+          "username":sessionStorage.getItem("username"),
+          "role":sessionStorage.getItem("userrole")
         },
       };
       this.$axios(this.options).then((res) => {

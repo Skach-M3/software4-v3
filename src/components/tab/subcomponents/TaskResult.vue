@@ -315,6 +315,9 @@ export default {
         var result_str = res.data[0].replace(/NaN/g, "null");
         this.distribution = JSON.parse(result_str);
       }
+    }).catch((err) => {
+      this.$message.warning("数据表已删除，故无法进行统计！");
+      this.distribution = [];
     });
 
     this.initFlag = true;
