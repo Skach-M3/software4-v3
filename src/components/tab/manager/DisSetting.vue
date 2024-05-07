@@ -63,6 +63,7 @@
             sortable
             width="150">
         </el-table-column>
+        <!-- 新增多疾病设置 -->
         <el-table-column label="操作（注释：删除上级病种时会将该病种下所有病种删除！）">
           <template slot-scope="scope">
                         <el-button
@@ -71,12 +72,13 @@
                             circle
                             style="margin-left: 60%;"
                             @click="setAddDisease(scope.row)"
+                            v-if="scope.row.label!=='多疾病'&& scope.row.id!=='14'"
                         ></el-button>
-            <el-button type="primary" icon="el-icon-edit" circle @click="getInfoDisease(scope.row)"></el-button>
+            <el-button type="primary" icon="el-icon-edit" circle @click="getInfoDisease(scope.row)" v-if="scope.row.label!=='多疾病' && scope.row.id!=='14'"></el-button>
             <el-popconfirm confirm-button-text='确定' cancel-button-text='取消' icon="el-icon-info"
                            icon-color="red" title="确定删除该病种吗？" @confirm="deleteDisease(scope.row)">
               <el-button type="danger" icon="el-icon-delete" circle slot="reference"
-                         style="margin-left: 10px;"></el-button>
+                         style="margin-left: 10px;" v-if="scope.row.label!=='多疾病'&& scope.row.id!=='14'"></el-button>
             </el-popconfirm>
           </template>
         </el-table-column>

@@ -10,43 +10,43 @@
       <el-input placeholder="输入关键字进行过滤" v-model="filterText">
       </el-input>
       <div class="treeArea">
-          <!-- =========================================私有数据集树 -->
+        <!-- =========================================私有数据集树 -->
         <el-tree ref="tree1" :data="treeData1" :show-checkbox="false" node-key="id" :default-expanded-keys="['1']"
           :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
             <span class="left_span">
-              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"
-              ></i>
-              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID" style="color: rgb(40, 207, 18);"
-              ></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID"
+                style="color: rgb(40, 207, 18);"></i>
               <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
                 }}</span>
-              <span v-else :class="{'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12}">{{ node.label }}
-                <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
+              <span v-else
+                :class="{ 'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12 }">{{
+          node.label }}
+          <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
               </span>
-              
-            </span>
-            
+          </span>
+
             <span>
-              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
-                cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
-                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
-                  type="text" slot="reference" @click="markNode(data)">
+              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集"
+                title="请选择添加数据集方式" cancel-button-type="primary" @confirm="importData"
+                @cancel="openAddDataForm(data.label)">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
+                  icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
               </el-popconfirm>
-              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集"
-                @confirm="importData">
-                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
-                  type="text" slot="reference" @click="markNode(data)">
+              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集" @confirm="importData">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
+                  icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
               </el-popconfirm>
 
               <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
                 cancel-button-text="取消" @confirm="() => remove(node, data)">
                 <el-button v-if="(data.isLeafs == 1 && data.status == 0) ||
-                (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
-                " icon="el-icon-delete" size="mini" type="text" slot="reference">
+          (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
+          " icon="el-icon-delete" size="mini" type="text" slot="reference">
                 </el-button>
               </el-popconfirm>
             </span>
@@ -58,38 +58,39 @@
           :expand-on-click-node="false" :highlight-current="true" @node-click="changeData"
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
-            <span  class="left_span">
-              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"
-              ></i>
-              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID" style="color: rgb(40, 207, 18);"
-              ></i>
+            <span class="left_span">
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1 && data.uid != loginUserID"></i>
+              <i class="el-icon-document tree_icon" v-if="data.isLeafs == 1 && data.uid == loginUserID"
+                style="color: rgb(40, 207, 18);"></i>
               <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
                 }}</span>
-              <span v-else :class="{'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12}">{{ node.label }}
+              <span v-else
+                :class="{ 'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12 }">{{
+          node.label }}
                 <span v-if="data.isLeafs == 1 && data.uid == loginUserID"> （我）</span>
               </span>
-              
+
             </span>
-            
+
             <span>
-              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
-                cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
-                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
-                  type="text" slot="reference" @click="markNode(data)">
+              <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集"
+                title="请选择添加数据集方式" cancel-button-type="primary" @confirm="importData"
+                @cancel="openAddDataForm(data.label)">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
+                  icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
               </el-popconfirm>
-              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集"
-                @confirm="importData">
-                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0" icon="el-icon-circle-plus-outline" size="mini"
-                  type="text" slot="reference" @click="markNode(data)">
+              <el-popconfirm v-else confirm-button-text="上传数据集" title="请上传本地多疾病数据集" @confirm="importData">
+                <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
+                  icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
               </el-popconfirm>
 
               <el-popconfirm title="删除后无法恢复" icon="el-icon-warning" icon-color="red" confirm-button-text="确认"
                 cancel-button-text="取消" @confirm="() => remove(node, data)">
                 <el-button v-if="(data.isLeafs == 1 && data.status == 0) ||
-            (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
-            " icon="el-icon-delete" size="mini" type="text" slot="reference">
+          (data.isLeafs == 1 && data.uid == loginUserID && data.status != 2)
+          " icon="el-icon-delete" size="mini" type="text" slot="reference">
                 </el-button>
               </el-popconfirm>
             </span>
@@ -102,13 +103,14 @@
           :filter-node-method="filterNode">
           <span class="custom-tree-node" slot-scope="{ node, data }">
             <span class="left_span">
-              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1"
-              ></i>
+              <i class="el-icon-document  tree_icon" v-if="data.isLeafs == 1"></i>
               <span v-if="data.catLevel == 1" style="font-weight: bold; font-size: 15px; color: #252525">{{ node.label
                 }}</span>
-              <span v-else :class="{'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12}">{{ node.label }}</span>
+              <span v-else
+                :class="{ 'nodeLabel': node.label.length <= 12, 'scrolling-nodeLabel': node.label.length > 12 }">{{
+          node.label }}</span>
             </span>
-            
+
             <!-- <span>
               <el-popconfirm confirm-button-text="上传数据集" cancel-button-text="纳排数据集" title="请选择添加数据集方式"
                 cancel-button-type="primary" @confirm="importData" @cancel="openAddDataForm(data.label)">
@@ -161,6 +163,8 @@
           <span class="titleText">所属类别：</span>
           <span class="belongType">{{ showFeatureDataForm.classPath }}</span> -->
         </div>
+        <span v-if="nodeData.status == '1'">共享用户名单：{{ share_username }}</span>
+        <el-button v-if="nodeData.status == '1'" @click="shareUserSelectDialog = true">选择共享用户</el-button>
       </div>
       <div class="addDataClass" style="margin-top: 20px">
         <div class="addDataTitle">
@@ -237,7 +241,8 @@
         </div>
         <!-- 显示筛选出来的表数据 -->
         <el-table :data="addTableData" stripe style="width: 100%" height="450" v-show="showAddTableData"
-          :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading" element-loading-text="正在抽取数据">
+          :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
+          element-loading-text="正在抽取数据">
           <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
             sortable>
             <template slot-scope="{ row }">
@@ -304,11 +309,19 @@
         <el-form-item label="涉及疾病" prop="dataDisease">
           <el-input v-model="dialogForm.dataDisease" :disabled="true" style="width: 150px"></el-input>
         </el-form-item>
+        <el-form-item v-if="nodeData.status == '1'">
+          <span>共享用户名单：{{ share_username }}</span>
+        </el-form-item>
+        <el-form-item v-if="nodeData.status == '1'">
+          <el-button @click="shareUserSelectDialog = true">选择共享用户</el-button>
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="
           dialogFormVisible = false;
         resetForm('dialogFormRef');
+        share_uid_list=[];
+        share_username='';
         ">取消</el-button>
         <el-button @click="resetForm('dialogFormRef')">重置</el-button>
         <el-button type="primary" @click="uploadFile">确定</el-button>
@@ -352,9 +365,11 @@
             showDataForm.classPath
           }}</span> -->
             <el-button type="success" size="mini" class="change_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '0'" @click="changeStatus()">转为共享</el-button>
+              v-if="nodeData.uid === loginUserID && nodeData.status == '0'" @click="TableshareUserSelectDialog = true">转为共享</el-button>
             <el-button type="success" size="mini" class="change_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeStatus()">转为私有</el-button>
+              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeToPrivate()">转为私有</el-button>
+              <el-button type="warning" size="mini" class="change_status_btn"
+              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeShareStatus()">更改共享人员</el-button>
             <el-button type="primary" @click="csvDialogVisible = true" size="mini" v-if="showDataForm.tableName"
               class="csv_btn">导出数据</el-button>
           </p>
@@ -400,6 +415,43 @@
           <el-button type="primary" @click="toXLSX">确 定</el-button>
         </span>
       </el-dialog>
+
+      <!-- 上传数据选择共享用户对话框 -->
+      <el-dialog title="请选择要共享的用户" :visible.sync="shareUserSelectDialog" width="40%">
+        <div style="text-align: center">
+          <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
+            filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
+            :data="all_uid_list">
+            <el-button class="transfer-footer" slot="left-footer" size="small" @click="cancelShare()">取消</el-button>
+            <el-button class="transfer-footer" slot="right-footer" size="small" @click="Share()">完成</el-button>
+          </el-transfer>
+        </div>
+      </el-dialog>
+
+            <!-- 单独表进行共享用户对话框 -->
+            <el-dialog title="请选择要共享的用户" :visible.sync="TableshareUserSelectDialog" width="40%">
+        <div style="text-align: center">
+          <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
+            filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
+            :data="all_uid_list">
+            <el-button class="transfer-footer" slot="left-footer" size="small" @click="cancelShare()">取消</el-button>
+            <el-button class="transfer-footer" slot="right-footer" size="small" @click="compeleteShare()">完成</el-button>
+          </el-transfer>
+        </div>
+      </el-dialog>
+
+                  <!-- 单独表进行共享用户更改对话框 -->
+                  <el-dialog title="请进行共享用户更改" :visible.sync="TableshareUserChangeDialog" width="40%">
+        <div style="text-align: center">
+          <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
+            filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
+            :data="all_uid_list">
+            <el-button class="transfer-footer" slot="left-footer" size="small" @click="cancelShare()">取消</el-button>
+            <el-button class="transfer-footer" slot="right-footer" size="small" @click="compeleteShare()">完成</el-button>
+          </el-transfer>
+        </div>
+      </el-dialog>
+
     </div>
   </div>
 </template>
@@ -531,7 +583,6 @@ export default {
       addDataLoading: false,
       characterOptList: [],
       addTableData: [],
-      input3: "",
       select: "",
 
       dialogDiseaseVisible2: false,
@@ -595,10 +646,18 @@ export default {
       labelList: [],
       table_loading: false,
       filterText: '',
-      compelete_node:{},
-      compelete_userId:'',
-      compelete_size:'',
-      compelete_tableDescribe:{}      
+      compelete_node: {},
+      compelete_userId: '',
+      compelete_size: '',
+      compelete_tableDescribe: {},
+      // 新增可共享用户列表
+      uid_list: '',
+      all_uid_list: [],
+      share_uid_list: [],
+      shareUserSelectDialog: false,
+      share_username:'',
+      TableshareUserSelectDialog:false,
+      TableshareUserChangeDialog:false
     };
   },
 
@@ -658,6 +717,7 @@ export default {
       });
     }, 200);
     this.getCatgory();
+    this.getUserList();
   },
 
   methods: {
@@ -703,15 +763,15 @@ export default {
               });
               return values.join(",");
             });
-            rows.forEach(row => {
-              //将每一行数据转换为列表
-              row = row.split(",");
-              final_data.push(row);
+          rows.forEach(row => {
+            //将每一行数据转换为列表
+            row = row.split(",");
+            final_data.push(row);
           });
           const ws = XLSX.utils.aoa_to_sheet(final_data);
           const wb = XLSX.utils.book_new();
           XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-          XLSX.writeFile(wb, this.showDataForm.tableName+'.xlsx');
+          XLSX.writeFile(wb, this.showDataForm.tableName + '.xlsx');
           this.csvDialogVisible = false;
           this.selectedFields = [];
         }
@@ -735,10 +795,10 @@ export default {
       const payload_feature = {
         tableName: this.dialogForm.tableName,
         tableHeaders: [],
-        userID:this.compelete_userId,
-        node:this.compelete_node,
-        size:this.compelete_size,
-        tableDescribe:this.compelete_tableDescribe
+        userID: this.compelete_userId,
+        node: this.compelete_node,
+        size: this.compelete_size,
+        tableDescribe: this.compelete_tableDescribe
       };
       for (const key in this.featuresMap) {
         if (Object.hasOwnProperty.call(this.featuresMap, key)) {
@@ -831,6 +891,7 @@ export default {
       );
       payload.append("is_upload", "1");
       payload.append("is_filter", "0");
+      payload.append("uid_list", this.uid_list);
       this.options = {
         method: "post",
         data: payload,
@@ -886,6 +947,7 @@ export default {
         this.treeData2 = response.data.slice(1, 2);
         this.treeData3 = response.data.slice(2, 3);
         // 获取病种和数据集总数
+        this.filterText='';
         this.diseaseNum = response.data[0].children.length;
         getRequest("/api/getTableNumber").then((res) => {
           if (res.code == 200) this.datasetNum = res.data;
@@ -1055,6 +1117,7 @@ export default {
     },
     addTable() {
       // 创建表
+      this.addDataForm.uid_list = this.uid_list,
       this.diseaseName = this.addDataForm.dataName;
       this.dialogDataVisible = false;
       let filterConditions = {};
@@ -1071,6 +1134,9 @@ export default {
       };
       this.$axios(this.options).then((res) => {
         this.getCatgory();
+        this.share_uid_list = [];
+        this.share_username = '';
+        this.uid_list = '';
       });
     },
     putToAddDataForm() {
@@ -1106,7 +1172,6 @@ export default {
       // console.log(this.addDataForm.characterList);
       this.showAddTableData = true;
       this.addDataLoading = true;
-      
       let filterConditions = {};
       filterConditions.addDataForm = this.addDataForm;
       filterConditions.nodeData = this.nodeData;
@@ -1152,6 +1217,7 @@ export default {
         createUser: sessionStorage.getItem("username"),
         isUpload: "0",
         isFilter: "1",
+        uid_list: this.uid_list,
         characterList: [
           {
             opt: "",
@@ -1268,22 +1334,97 @@ export default {
         );
       }
     },
+    compeleteShare(){
+      this.uid_list = this.share_uid_list.join(",");
+      postRequest("/api/category/changeToShare", {
+        nodeid: this.nodeData.id,
+        uid_list: this.uid_list,
+      }).then((res) => {
+        if (res.code == 200) {
+          this.$message.success("分享成功");
+          this.TableshareUserSelectDialog = false;
+          this.TableshareUserChangeDialog = false;
+          this.share_uid_list = [];
+          this.uid_list='';
+          this.getCatgory();
+        } else {
+          this.$message.error("分享失败");
+        }
+      });
+  
 
-    changeStatus() {
-      getRequest("/api/changeStatus", this.nodeData)
+    },
+    changeToPrivate() {
+      console.log(this.nodeData);
+      postRequest("/api/category/changeToPrivate", {
+        nodeid: this.nodeData.id
+      })
+        .then((res) => {
+        if (res.code == 200) {
+          this.$message.success("转为私有成功");
+          this.getCatgory();
+          this.getTableDescribe(this.nodeData.id, this.nodeData.label);
+          this.nodeData.status = "0";
+        } else {
+          this.$message.error("转为私有失败");
+        }
+      }).catch((error) => {
+          console.log(error);
+        });
+    },
+    getUserList() {
+      getRequest(`/user/getTransferUserList?uid=${this.loginUserID}`)
         .then((response) => {
           if (response.code == 200) {
-            this.getCatgory();
-            this.tableData = [];
-            this.nodeData = {};
-            this.$message.success("操作成功");
-            //获取数据信息
+            this.all_uid_list = response.data
+            console.log(this.all_uid_list);
           }
         })
         .catch((error) => {
           console.log(error);
         });
     },
+    filterMethod(query, item) {
+      return item.label.indexOf(query) > -1;
+    },
+    cancelShare(){
+      this.shareUserSelectDialog = false;
+      this.TableshareUserChangeDialog = false;
+      this.TableshareUserSelectDialog = false;
+      this.uid_list = '';
+    },
+    Share(){
+      this.uid_list = this.share_uid_list.join(",");
+      this.shareUserSelectDialog = false;
+      var username_list = [];
+      for(var user of this.all_uid_list){
+          if(this.share_uid_list.includes(user.key)){
+            username_list.push(user.label);
+          }
+      
+      }
+      console.log(this.uid_list);
+      console.log(this.share_uid_list);
+      this.share_username = username_list.join(",");
+
+    },
+    changeShareStatus(){
+     this.TableshareUserChangeDialog = true;
+     postRequest("/api/category/getNodeInfo", {
+        nodeid: this.nodeData.id,
+        uid: this.loginUserID,
+      })
+        .then((res) => {
+        if (res.code == 200) {
+          this.$message.success("转为私有成功");
+          this.share_uid_list = res.data;
+        } else {
+          this.$message.error("转为私有失败");
+        }
+      }).catch((error) => {
+          console.log(error);
+        });
+    }
   },
 };
 </script>
@@ -1374,8 +1515,9 @@ h3 {
   overflow: auto;
 }
 
-.treeArea{
-  height: calc(820px - 93px);/* 93px是头部信息和按钮的高度 */
+.treeArea {
+  height: calc(820px - 93px);
+  /* 93px是头部信息和按钮的高度 */
   overflow: auto;
 }
 
@@ -1389,34 +1531,41 @@ h3 {
   overflow: hidden;
 }
 
-.custom-tree-node .left_span{
+.custom-tree-node .left_span {
   width: 12em;
   overflow: hidden;
 }
 
-.nodeLabel, .scrolling-nodeLabel{
+.nodeLabel,
+.scrolling-nodeLabel {
   display: inline-block;
-  white-space: nowrap;  /* 禁止文本换行 */
-  box-sizing: border-box;  /* 边框和内填充的宽度也包含在width内 */
+  white-space: nowrap;
+  /* 禁止文本换行 */
+  box-sizing: border-box;
+  /* 边框和内填充的宽度也包含在width内 */
 }
 
-.scrolling-nodeLabel:hover{
+.scrolling-nodeLabel:hover {
   position: relative;
   overflow: hidden;
   vertical-align: text-bottom;
-  animation: scrollText 3s linear infinite;  /* 动画持续时间和循环方式 */
+  animation: scrollText 3s linear infinite;
+  /* 动画持续时间和循环方式 */
 }
 
 @keyframes scrollText {
   0% {
     transform: translateX(0px);
   }
+
   12% {
     transform: translateX(0px);
   }
+
   75% {
     transform: translateX(calc(-100% + 12em));
   }
+
   100% {
     transform: translateX(calc(-100% + 12em));
   }
@@ -1579,6 +1728,11 @@ h3 {
   right: 10%;
   top: 5%;
 }
+.change_status_btn{
+  position: absolute;
+  right: 18%;
+  top: 5%;
+}
 
 .charactersGroup {
   display: grid;
@@ -1586,5 +1740,10 @@ h3 {
   align-content: flex-start;
   height: 500px;
   overflow: auto;
+}
+
+.transfer-footer {
+  margin-left: 20px;
+  padding: 6px 5px;
 }
 </style>

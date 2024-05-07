@@ -47,6 +47,10 @@
               <i class="el-icon-menu"></i>
               <span slot="title">字段管理</span>
             </el-menu-item> -->
+            <el-menu-item index="/dataManage">
+              <i class="el-icon-s-data"></i>
+              <span slot="title">数据管理</span>
+            </el-menu-item>
             <el-submenu index="1">
               <template slot="title">
                 <i class="el-icon-folder"></i>
@@ -70,10 +74,7 @@
               </el-menu-item>
             </el-submenu>
 
-            <el-menu-item index="/dataManage">
-              <i class="el-icon-s-data"></i>
-              <span slot="title">数据管理</span>
-            </el-menu-item>
+
 
             <el-submenu index="2" v-if="role == 0">
               <template slot="title">

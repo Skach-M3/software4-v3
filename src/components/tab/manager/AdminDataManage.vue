@@ -106,6 +106,20 @@
                 <el-button @click="closeDialog()">取 消</el-button>
                 <el-button type="primary" @click="uploadFile">确 定</el-button>
             </div>
+
+            <!-- 多疾病新增 -->
+            <el-dialog v-loading="loading2" :element-loading-text="loadText2" append-to-body title="请选择多个疾病标签字段"
+                :visible.sync="featuresVision" :show-close="false" :close-on-click-modal="false"
+                :close-on-press-escape="false">
+                <!-- <el-form class="featureLabel" label-width="auto"> -->
+                <el-checkbox-group v-model="labelList">
+                    <el-checkbox style="width: 250px" border v-for="(name, index) in Object.keys(featuresMap)"
+                        :key="index" :label="name"></el-checkbox>
+                </el-checkbox-group>
+                <div slot="footer" class="dialog-footer">
+                    <el-button type="primary" @click="compelete">完成上传</el-button>
+                </div>
+            </el-dialog>
         </el-dialog>
 
         <el-dialog title="编辑数据信息" :visible.sync="editAdminDataManageVisible">
@@ -170,6 +184,8 @@
             </div>
         </el-dialog>
 
+
+
     </div>
 </template>
 
@@ -223,7 +239,6 @@ export default {
             },
 
             adminDataManageList: [],
-
             uploadDataDialogVisible: false,
             pid: '',
             loading: false,
@@ -273,7 +288,6 @@ export default {
                 tableStatus: "",
                 tableSize: 0
             },
-
             roles: [
                 {
                     label: "管理员",
@@ -301,6 +315,16 @@ export default {
                     label: "否",
                 },
             ],
+            //多疾病新增
+            featuresMap: {},
+            featuresVision: false,
+            labelList: [],
+            loadText2: "拼命加载中",
+            loading2: false,
+            compelete_node: {},
+            compelete_userId: '',
+            compelete_size: '',
+            compelete_tableDescribe: {},
         };
     },
 
@@ -393,7 +417,56 @@ export default {
                 }
             })
         },
+        //新增多疾病
+        compelete() {
+            // 判断多标签合理性，并填写上传payload
+            let labelCount = 0;
+            const payload_feature = {
+                tableName: this.dialogForm.tableName,
+                tableHeaders: [],
+                userID: this.compelete_userId,
+                node: this.compelete_node,
+                size: this.compelete_size,
+                tableDescribe: this.compelete_tableDescribe
+            };
+            for (const key in this.featuresMap) {
+                if (Object.hasOwnProperty.call(this.featuresMap, key)) {
+                    const tempObject = {
+                        fieldName: key,
+                        isLabel: 0,
+                    };
+                    if (this.labelList.includes(key)) {
+                        tempObject.isLabel = 1;
+                        labelCount++;
+                    }
+                    payload_feature.tableHeaders.push(tempObject);
+                }
+            }
+            if (labelCount < 2) {
+                this.$message({
+                    showClose: true,
+                    type: "warning",
+                    message: "请至少设置两个标签特征",
+                });
+                return false;
+            }
 
+            this.loadText2 = "正在打标";
+            this.loading2 = true;
+
+            postRequest("/tTable/insertTableManager", payload_feature).then((res) => {
+                if (res.code == 200) {
+                    this.loading2 = false;
+                    this.featuresVision = false;
+                    this.$message({
+                        showClose: true,
+                        type: "success",
+                        message: "完成",
+                    });
+                    this.getAllAdminDataTable();
+                }
+            });
+        },
 
         getAllAdminDataTable() {
             getRequest(`/api/selectAdminDataManage`).then(res => {
@@ -450,6 +523,7 @@ export default {
 
         },
         // 数据表上传函数
+        //新增多疾病
         upRequest(data) {
             if (this.selectedOptions.length < 1) {
                 this.$message({
@@ -458,64 +532,118 @@ export default {
                 });
                 return;
             }
-            // if (this.dialogForm.dataDisease2 === ''){
-            //     this.$message({
-            //         type: "warning",
-            //         message: "请选择该数据表应该在什么二级病种",
-            //     });
-            //     return;
-            // }
-            console.log("开始上传文件");
+            if (this.selectedOptions.length === 1 && this.selectedOptions[0] === '14') {
+                console.log("开始上传文件");
+                const payload = new FormData();
+                const fileSize = data.file.size;
 
-            const fileSize = data.file.size;
+                const fileSizeInMB = (fileSize / 100000).toFixed(2)
+                payload.append("file", data.file);
+                payload.append("newName", this.dialogForm.tableName);
+                payload.append("disease", "多疾病");
+                payload.append("user", sessionStorage.getItem("username"));
+                payload.append("uid", sessionStorage.getItem("userid"));
+                payload.append("parentId", this.selectedOptions[0]);
+                payload.append("parentType", "多疾病");
+                payload.append("status", "2");
+                payload.append(
+                    "size",
+                    fileSizeInMB
+                );
+                payload.append("is_upload", "1");
+                payload.append("is_filter", "0");
+                payload.append("uid_list", "");
+                this.options = {
+                    method: "post",
+                    data: payload,
+                    url: "api/dataTable/parseAndUpload",
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                };
+                this.$axios(this.options).then((res) => {
+                    console.log(this.options.data.get("uid"));
+                    // 返回表头信息
+                    this.loading = false;
+                    if (res?.code == "200") {
+                        this.$message({
+                            showClose: true,
+                            type: "success",
+                            message: "解析成功",
+                        });
+                        let featureList = res.data.featureList;
+                        this.compelete_userId = res.data.userId;
+                        this.compelete_node = res.data.node;
+                        this.compelete_size = res.data.size;
+                        this.compelete_tableDescribe = res.data.tableDescribe;
+                        console.log(featureList);
+                        //把特征存为map的键
+                        for (const item of featureList) {
+                            this.$set(this.featuresMap, item, "diagnosis");
+                        }
+                        this.featuresVision = true;
+                        this.uploadDataDialogVisible = false;
+                        this.getAllAdminDataTable();
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            type: "error",
+                            message: "解析失败",
+                        });
+                    }
+                });
+            }
+            else {
+                console.log("开始上传文件");
 
-            const fileSizeInMB = (fileSize / 100000).toFixed(2)
-            console.log("fileSize", fileSize, fileSizeInMB);
+                const fileSize = data.file.size;
 
-            const payload = new FormData();
-            payload.append("file", data.file);
-            payload.append("pid", this.pid);
-            payload.append("tableName", this.dialogForm.tableName);
-            payload.append("userName", sessionStorage.getItem("username"));
+                const fileSizeInMB = (fileSize / 100000).toFixed(2)
+                console.log("fileSize", fileSize, fileSizeInMB);
 
-            payload.append("ids", this.selectedOptions)
+                const payload = new FormData();
+                payload.append("file", data.file);
+                payload.append("pid", this.pid);
+                payload.append("tableName", this.dialogForm.tableName);
+                payload.append("userName", sessionStorage.getItem("username"));
 
-            payload.append("uid", sessionStorage.getItem("userid"));
-            payload.append("tableStatus", "2");
-            payload.append("tableSize", fileSizeInMB);
-            payload.append("current_uid", sessionStorage.getItem("userid"));
+                payload.append("ids", this.selectedOptions)
 
-            this.options = {
-                method: "post",
-                data: payload,
-                url: "/api/uploadDataTable",
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            };
+                payload.append("uid", sessionStorage.getItem("userid"));
+                payload.append("tableStatus", "2");
+                payload.append("tableSize", fileSizeInMB);
+                payload.append("current_uid", sessionStorage.getItem("userid"));
 
-            this.$axios(this.options).then((res) => {
-                // 返回表头信息
-                this.loading = false;
-                console.log(res);
-                if (res?.code == "200") {
-                    this.$message({
-                        showClose: true,
-                        type: "success",
-                        message: "解析成功",
-                    });
-                    // this.featuresVision = true;
-                    this.uploadDataDialogVisible = false;
-                    this.getAllAdminDataTable();
-                } else {
-                    this.$message({
-                        showClose: true,
-                        type: "error",
-                        message: "解析失败",
-                    });
-                }
-            });
+                this.options = {
+                    method: "post",
+                    data: payload,
+                    url: "/api/uploadDataTable",
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                };
+                this.$axios(this.options).then((res) => {
+                    // 返回表头信息
+                    this.loading = false;
+                    console.log(res);
+                    if (res?.code == "200") {
+                        this.$message({
+                            showClose: true,
+                            type: "success",
+                            message: "解析成功",
+                        });
 
+                        this.uploadDataDialogVisible = false;
+                        this.getAllAdminDataTable();
+                    } else {
+                        this.$message({
+                            showClose: true,
+                            type: "error",
+                            message: "解析失败",
+                        });
+                    }
+                });
+            }
         },
         uploadFile() {
             if (this.selectedOptions.length < 1) {
@@ -721,7 +849,7 @@ export default {
                         message: "更改成功",
 
                     });
-                    // this.featuresVision = true;
+
                 } else {
                     this.$message({
                         showClose: true,
