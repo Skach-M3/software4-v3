@@ -51,7 +51,10 @@
                 </el-table-column>
                 <el-table-column prop="tableSize" label="数据表大小" width="100">
                 </el-table-column>
-
+                <el-table-column prop="checkApproving" label="申请下载用户" width="150">
+                </el-table-column>
+                <el-table-column prop="checkApproved" label="已批准下载用户" width="150">
+                </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" circle
@@ -62,6 +65,10 @@
                             <el-button type="danger" icon="el-icon-delete" circle slot="reference"
                                 style="margin-left: 10px;"></el-button>
                         </el-popconfirm>
+                        <el-badge :value="checkInfos(scope.row.checkApproving)" class="item"  style="margin-left: 10px;">
+                            <el-button type="warning" icon="el-icon-s-check" circle
+                            @click="getCheckDataById(scope.row.id, scope.row.tableName)"></el-button>                        
+                        </el-badge>
                     </template>
                 </el-table-column>
             </el-table>
@@ -184,6 +191,111 @@
             </div>
         </el-dialog>
 
+        <el-dialog title="数据表下载审批" :visible.sync="checkAdminDataManageVisible" v-loading="multipleLoding">
+           
+           <el-button type="primary" round 
+               @click="selectTableVisible=true;selectTableByid()">
+               <i  class="el-icon-document"></i>数据预览</el-button>
+           <el-button type="success" round 
+               @click="confirmUsenames(1)">
+               <i  class="el-icon-check"></i>一键同意</el-button>
+           <el-button type="danger" round 
+               @click="confirmUsenames(0)">
+               <i  class="el-icon-close"></i>一键拒绝</el-button>
+           
+           <el-table
+               ref="multipleTable"
+               :data="checkDataManageForm"
+               tooltip-effect="dark"
+               style="width: 100%"
+               @selection-change="handleSelectionChange"
+               >
+               <el-table-column
+               
+                   type="selection"
+                   width="55"
+                   label="全选"
+                   align="center">
+               </el-table-column>
+               <el-table-column
+                   type="index"
+                   width="50"
+                   label="id"
+                   align="center">                    
+               </el-table-column>
+               <el-table-column
+                   prop="uid"
+                   label="用户id"
+                   width="120"
+                   align="center">
+               </el-table-column>
+               <el-table-column
+                   prop="username"
+                   label="用户名称"
+                   width="120"
+                   align="center">
+               </el-table-column>
+               <el-table-column
+                   prop="classpath"
+                   label="所属类别"
+                   
+                   align="center">
+               </el-table-column>
+
+               <el-table-column label="操作" align="center">
+                   <template slot-scope="scope">
+                       <el-button type="success" round
+                           @click="updateCheckApprove(scope.row.username, 1)">同意下载</el-button>
+                       
+                       <el-button type="danger" round
+                       @click="updateCheckApprove(scope.row.username, 0)">拒绝下载</el-button>
+                       
+                   </template>
+               </el-table-column>
+           </el-table>
+           <div slot="footer" class="dialog-footer">
+               <el-button @click="checkAdminDataManageVisible = false">取 消</el-button>
+               <el-button type="primary" @click="checkAdminDataManageVisible = false">关 闭</el-button>
+           </div>
+       </el-dialog>
+
+       <el-dialog title="数据表预览" :visible.sync="selectTableVisible">
+           <div>
+           <div class="table-container-after">
+               <!---------------------------------- 骨架屏 --------------------------------->
+               <el-skeleton
+               v-if="selectTableLoading"
+               style="width: 100%"
+               :rows="30"
+               animated
+               />
+
+               <el-table
+               v-else
+               :data="tableData"
+               stripe
+               class="custom-table"
+               :header-cell-style="headerCellStyle"
+               ref="scrollTable"
+               height="700vh"
+               >
+               <el-table-column
+                   v-for="(value, key) in tableData[0]"
+                   :key="key"
+                   :prop="key"
+                   :label="key"
+                   width="auto"
+                   :show-overflow-tooltip="true"
+                   :sortable="true"
+               >
+                   <template slot-scope="{ row }">
+                   <div class="truncate-text">{{ row[key] }}</div>
+                   </template>
+               </el-table-column>
+               </el-table>
+           </div>
+           </div>
+       </el-dialog>
 
 
     </div>
@@ -192,6 +304,7 @@
 <script>
 import { getRequest, postRequest } from "@/api/user";
 import { resetForm, debounce } from "@/components/mixins/mixin";
+import { getTableDes, getTableData } from "@/api/tableDescribe.js";
 export default {
     mixins: [resetForm, debounce],
 
@@ -207,8 +320,28 @@ export default {
         displayedAdminDataManageList() {
             const startIndex = (this.params.page - 1) * this.params.size;
             const endIndex = startIndex + this.params.size;
-            return this.adminDataManageList.slice(startIndex, endIndex);
+            // 首先对数据进行排序
+            const sortedList = this.adminDataManageList.sort((a, b) => {
+                // 假设 scope.row.checkApproving 是 a.checkApproving
+                const checkApprovingA = this.checkInfos(a.checkApproving);
+                const checkApprovingB = this.checkInfos(b.checkApproving);
+                // 降序排序，如果 checkApprovingA 大于 checkApprovingB，则 a 应该排在 b 前面
+                if (checkApprovingA > checkApprovingB) {
+                return -1;
+                } else if (checkApprovingA < checkApprovingB) {
+                return 1;
+                } else {
+                return 0; // 如果相等，则保持原有顺序
+                }
+            });
+            // 然后切片出当前页需要显示的数据
+            return sortedList.slice(startIndex, endIndex);
         },
+        headerCellStyle() {
+            return {
+                color: "black",
+            };
+            },
     },
 
     data() {
@@ -325,6 +458,20 @@ export default {
             compelete_userId: '',
             compelete_size: '',
             compelete_tableDescribe: {},
+            // 审批表格
+            checkAdminDataManageVisible: false,
+            checkDataManageForm:{
+                username: '',
+                uid:'',
+                classpath: ""
+            },
+            tid: "",
+            tname:"",
+            multipleSelection: [],
+            multipleLoding: false,
+            selectTableLoading: false,
+            selectTableVisible: false,
+            tableData:[]
         };
     },
 
@@ -861,7 +1008,109 @@ export default {
             });
             this.getAllAdminDataTable();
             this.editAdminDataManageVisible = false;
-        }
+        },
+        checkInfos(usernames){
+            // 确保 usernames 是字符串
+   
+            if (typeof usernames !== 'string') {
+
+                return "";
+            }
+            if (usernames==null || usernames.trim().length === 0){
+                return "";
+            }
+            console.log("usernames", usernames)
+            let infos = usernames.split(",");
+            return infos.length;
+        },
+        
+        selectTableByid(){
+            this.selectTableLoading=true;
+            getTableData("/api/getTableData", this.tid, this.tname)
+                .then((res) => {
+                    if (res.code == 200) {
+                        this.selectTableVisible = true;
+                        this.tableData = res.data;
+                        console.log("tableData:", res.data)  
+                        this.selectTableLoading=false;             
+                    } else {
+                        this.$message.error("获取表信息失败")                   
+                    }                
+                })
+                .catch((error) => {
+                    console.log(error);
+                });            
+        },
+
+        getCheckDataById(id, tableName) { 
+            this.tid=id;
+            this.tname=tableName;
+            getRequest(`/api/selectUsernamesById`, {
+                id: id
+            }).then(res => {
+                if (res.code == 501){ // 自定义状态码
+                    this.$message({
+                        type: "warning",
+                        message: "该数据集现在没有用户申请下载",
+                    });
+                    this.checkAdminDataManageVisible = false;
+                    return;
+                }
+
+                if (res.code == 200) {
+                    this.checkAdminDataManageVisible = true;
+                    this.checkDataManageForm = res.data;
+                    console.log("res.data:", res.data)               
+                } else {
+                    this.$message.error("获取用户信息失败")
+                    this.getAllAdminDataTable();
+
+                }
+            })
+        },
+
+        updateCheckApprove(username, type){
+            getRequest(`/api/updateCheckApprove`, {
+                id: this.tid,
+                username: username,
+                type: type
+            }).then(res => {
+                if (res.code == 200) {                    
+                    console.log("res.data:", res.data)       
+                    this.getCheckDataById(this.tid, this.tname);    
+                    this.getAllAdminDataTable();    
+                } else {
+                    this.$message.error("获取用户信息失败")
+                    this.getAllAdminDataTable();
+                }
+            })
+        },
+        confirmUsenames(type){
+            if (this.multipleSelection.length < 1){ // 自定义状态码
+                    this.$message({
+                        type: "warning",
+                        message: "请选择至少一个用户进行审批",
+                    });                    
+                    return;
+                } 
+            this.multipleLoding=true;
+            this.multipleSelection.forEach(
+                selection => this.updateCheckApprove(selection.username, type)
+            )         
+            this.multipleLoding=false;   
+        },
+        toggleSelection(rows) {
+            if (rows) {
+            rows.forEach(row => {
+                this.$refs.multipleTable.toggleRowSelection(row);
+            });
+            } else {
+            this.$refs.multipleTable.clearSelection();
+            }
+        },
+        handleSelectionChange(val) {
+            this.multipleSelection = val;
+        },
 
     },
 
@@ -912,5 +1161,9 @@ export default {
 
 .search_btn {
     margin-left: 1%;
+}
+
+.el-badge ::v-deep .el-badge__content{
+        margin-top:8px
 }
 </style>

@@ -422,15 +422,23 @@
             showDataForm.classPath
           }}</span> -->
             <el-button type="success" size="mini" class="change_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '0'"
+              v-if="tableData.length && nodeData.uid === loginUserID && nodeData.status == '0'"
               @click="TableshareUserSelectDialog = true">转为共享</el-button>
             <el-button type="success" size="mini" class="change_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeToPrivate()">转为私有</el-button>
+              v-if="tableData.length && nodeData.uid === loginUserID && nodeData.status == '1'" @click="changeToPrivate()">转为私有</el-button>
             <el-button type="warning" size="mini" class="change_status_btn"
-              v-if="nodeData.uid === loginUserID && nodeData.status == '1'"
+              v-if="tableData.length && nodeData.uid === loginUserID && nodeData.status == '1'"
               @click="changeShareStatus()">更改共享人员</el-button>
-            <el-button type="primary" @click="csvDialogVisible = true" size="mini" v-if="showDataForm.tableName"
-              class="csv_btn">导出数据</el-button>
+            <el-button type="success" @click="csvDialogVisible = true" 
+              v-if="(tableData.length && nodeData.status == '0' && nodeData.isUpload=='1') || downloadStatus == '2'" class="csv_btn" size="mini">允许下载</el-button>
+            <el-button type="primary" @click="applyDownload()" 
+              v-else-if="tableData.length && downloadStatus == '0'" class="csv_btn" size="mini">申请下载</el-button>
+            <el-button type="warning" @click="waitingCheck()" 
+              v-else-if="tableData.length && downloadStatus == '1'" class="csv_btn" size="mini">等待审核</el-button>
+            <!-- <el-button type="success" @click="csvDialogVisible = true" 
+              v-else-if="tableData.length && downloadStatus == '2'" class="csv_btn" size="mini">允许下载</el-button> -->
+            <!-- <el-button type="primary" @click="csvDialogVisible = true" size="mini" v-if="showDataForm.tableName"
+              class="csv_btn">导出数据</el-button> -->
           </p>
         </div>
         <!-- 显示表数据 -->
@@ -722,6 +730,9 @@ export default {
       selectedOptions: [],
       is_share: false,
       pid: '',
+      //允许下载
+      nodeid: "",
+      downloadStatus: "0",
     };
   },
 
@@ -1077,15 +1088,15 @@ export default {
             this.share_uid_list = [];
             this.share_username = '';
             this.uid_list = '';
-            this.is_share=false;
+            this.is_share = false;
             this.dialogForm = {
-                filesInfo: [],
-                tableName: "",
-                isOnly: true,
-                dataDisease: "",
-                featuresNum: 1,
-                fields: [{ name: "", type: "" }],
-             
+              filesInfo: [],
+              tableName: "",
+              isOnly: true,
+              dataDisease: "",
+              featuresNum: 1,
+              fields: [{ name: "", type: "" }],
+
             }
           } else {
             this.$message({
@@ -1147,13 +1158,13 @@ export default {
             this.uid_list = '';
             this.is_share = false;
             this.dialogForm = {
-                filesInfo: [],
-                tableName: "",
-                isOnly: true,
-                dataDisease: "",
-                featuresNum: 1,
-                fields: [{ name: "", type: "" }],
-           
+              filesInfo: [],
+              tableName: "",
+              isOnly: true,
+              dataDisease: "",
+              featuresNum: 1,
+              fields: [{ name: "", type: "" }],
+
             }
           } else {
             this.$message({
@@ -1252,6 +1263,8 @@ export default {
         });
     },
     changeData(data) {
+      this.nodeid = data.id;
+      
       if (data.isLeafs == 1) {
         this.showDataForm.featureNum = "";
         this.showDataForm.sampleNum = "";
@@ -1263,6 +1276,7 @@ export default {
         this.getTableData(data.id, data.label);
         this.nodeData = data;
         console.log(this.nodeData);
+        this.getCheckApprove();
       }
     },
     append(isLeaf) {
@@ -1706,37 +1720,91 @@ export default {
       console.log(this.pid, this.dataDisease)
     },
     closeDialog() {
-            this.uploadDataDialogVisible = false;
-            this.dialogForm = {
-                filesInfo: [],
-                tableName: "",
-                isOnly: true,
-                dataDisease: "",
-                featuresNum: 1,
-                fields: [{ name: "", type: "" }],
-                rules: {
-                    tableName: [
-                        {
-                            required: true,
-                            message: "数据表名称不能为空",
-                            trigger: "change",
-                        },
-                    ],
-                    dataDisease: [
-                        {
-                            required: true,
-                            message: "涉及疾病不能为空",
-                            trigger: "blur",
-                        },
-                    ],
-                    numFeatures: [
-                        { required: true, message: "特征个数不能为空", trigger: "blur" },
-                        { type: "integer", message: "特征个数需为整数", trigger: "blur" },
-                        { min: 1, message: "特征个数需>1", trigger: "blur" },
-                    ],
-                },
-            }
+      this.uploadDataDialogVisible = false;
+      this.dialogForm = {
+        filesInfo: [],
+        tableName: "",
+        isOnly: true,
+        dataDisease: "",
+        featuresNum: 1,
+        fields: [{ name: "", type: "" }],
+        rules: {
+          tableName: [
+            {
+              required: true,
+              message: "数据表名称不能为空",
+              trigger: "change",
+            },
+          ],
+          dataDisease: [
+            {
+              required: true,
+              message: "涉及疾病不能为空",
+              trigger: "blur",
+            },
+          ],
+          numFeatures: [
+            { required: true, message: "特征个数不能为空", trigger: "blur" },
+            { type: "integer", message: "特征个数需为整数", trigger: "blur" },
+            { min: 1, message: "特征个数需>1", trigger: "blur" },
+          ],
         },
+      }
+    },
+    getCheckApprove() {
+      getRequest(`/api/getCheckApprove`, {
+        id: this.nodeid,
+        username: sessionStorage.getItem("username")
+      }).then((res) => {
+        if (res.code == 200) {
+          // console.log("ret data", res.data);
+          this.downloadStatus = res.data;
+          // console.log(res.data);
+        }
+      });
+    },
+
+    applyDownload() {
+      getRequest(`/api/applyCheckApprove`, {
+        id: this.nodeid,
+        username: sessionStorage.getItem("username")
+      }).then((res) => {
+        if (res.code == 200) {
+          this.downloadStatus = res.data;
+          // console.log("ret data", res.data);
+          this.$message({
+            showClose: true,
+            type: "success",
+            message: res.msg,
+          });
+          // console.log(res.data);
+        }
+      });
+    },
+    waitingCheck() {
+      this.$message({
+        showClose: true,
+        type: "warning",
+        message: `申请还在审核中……，请尽快联系管理员审核`,
+      });
+    },
+    allowDownload() {
+      getRequest(`/api/allowCheckApprove`, {
+        id: this.nodeid,
+        username: sessionStorage.getItem("username")
+      }).then((res) => {
+        if (res.code == 200) {
+          // console.log("ret data", res.data);
+          this.downloadStatus = res.data;
+          this.$message({
+            showClose: true,
+            type: "success",
+            message: res.msg,
+          });
+          // console.log(res.data);
+        }
+      });
+    },
   },
 
 };
