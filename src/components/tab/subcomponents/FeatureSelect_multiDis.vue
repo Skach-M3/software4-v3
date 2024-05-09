@@ -502,13 +502,13 @@ export default {
 } */
 
 .buttonGroup {
+  width: 100%;
   position: fixed;
-  bottom: 40px;
-  right: 800px;
-  margin-top: 20px;
-  margin-left: 28%;
+  z-index: 8;
+  bottom: 22px;
+  padding-left: 25%;
+  background: #ffffff;
 }
-
 .content {
   width: 95%;
   height: auto;
