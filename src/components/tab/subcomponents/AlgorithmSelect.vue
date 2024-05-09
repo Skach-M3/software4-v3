@@ -105,7 +105,21 @@
           <div class="paramBox"></div>
         </el-tab-pane>
 
-        <el-tab-pane label="SSP-Tree" :disabled="true">SSP-Tree</el-tab-pane>
+        <el-tab-pane label="PC" name="PC">          
+          <div class="titleBox">PC</div>
+          <div class="introBox">
+            <p>模型说明：</p>
+            <p>
+              PC 算法是一种约束式搜索算法，主要用于从数据中学习贝叶斯网络的结构
+            </p>
+          </div>
+          <div class="buttonBox">
+            <el-button round @click="backStep()">上一步</el-button>
+            <el-button type="primary" round @click="submit('/runtime_bus/pc')"
+              >提交运算</el-button
+            >
+          </div>
+          <div class="paramBox"></div></el-tab-pane>
         <el-tab-pane label="FP-Growth" :disabled="true">FP-Growth</el-tab-pane>
         <el-tab-pane label="Logistic Regression" :disabled="true"
           >Logistic Regression</el-tab-pane
@@ -190,6 +204,7 @@ export default {
         })
         .catch((err) => {
           this.loading = false;
+          console.log("err", err);
           this.$message({
             showClose: true,
             type: "error",
@@ -199,10 +214,15 @@ export default {
 
         postRequest("/runtime_bus/traditional_statistic", payload)
         .then((res) => {
-          this.m_changeTaskInfo({ traditional_res: JSON.parse(res.data.res[0]) });
+          var jsonString = res.data.res[0].replace(/NaN/g, "null"); // 将 NaN 替换为 null
+
+          let parsedData = JSON.parse(jsonString);
+          this.m_changeTaskInfo({ traditional_res: parsedData });
+     
         })
         .catch((err) => {
           this.loading = false;
+          console.log("err", err);
           this.$message({
             showClose: true,
             type: "error",
