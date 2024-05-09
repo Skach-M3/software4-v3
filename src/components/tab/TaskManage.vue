@@ -282,7 +282,7 @@ export default {
 }
 
 .left_tree {
-  display: inline-block;
+  /* display: inline-block; */
   height: 820px;
   border-radius: 3px;
   border: 1px solid #e6e6e6;
@@ -317,8 +317,8 @@ h3 {
 }
 
 .right {
-  display: inline-block;
-  height: 99%;
+  /* display: inline-block; */
+  height: 100%;
 }
 
 .pagination {

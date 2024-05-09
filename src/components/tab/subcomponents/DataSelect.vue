@@ -234,6 +234,18 @@ export default {
     next(classPath, name) {
       var path = classPath.split("/");
       console.log(this.tempNode);
+      // 换了数据表vuex中的特征都要清空
+      if(name != this.m_dataset){
+        this.m_changeTaskInfo({
+        use_features: [],
+        known_features: [],
+        target_feature: [],
+        all_featrues: [],
+        caculate_target_feature: [],
+        caculate_use_features: [],
+        caculate_known_features: [],
+      });
+      }
       if (this.tempNode.isFilter == "1") {
         this.m_changeTaskInfo({
           disease: path[0],
@@ -401,21 +413,23 @@ export default {
 
 <style scoped>
 .buttonGroup {
+  position: fixed;
+  bottom: 30px;
   width: 200px;
-  margin-top: 35px;
-  margin-left: auto;
-  margin-right: auto;
+  /* margin-top: 35px; */
+  margin-left: 20%;
 }
 
 .content {
   position: relative;
   width: 100%;
-  height: 790px;
+  height: 680px;
+  margin-top: -20px;
 }
 
 .left_tree {
   display: inline-block;
-  height: 85%;
+  height: 100%;
   width: 15%;
   overflow: auto;
   border-radius: 3px;

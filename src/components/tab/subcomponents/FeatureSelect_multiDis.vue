@@ -502,6 +502,9 @@ export default {
 } */
 
 .buttonGroup {
+  position: fixed;
+  bottom: 40px;
+  right: 800px;
   margin-top: 20px;
   margin-left: 28%;
 }

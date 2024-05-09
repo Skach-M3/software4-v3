@@ -210,7 +210,7 @@ export default {
   height: calc(100vh - 81px);
   /* background-color: #333; */
   /* width: 100vh; */
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 .el-footer {
