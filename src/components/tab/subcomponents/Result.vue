@@ -144,6 +144,7 @@
           <div class="graphBox2">
             <Heat
               title_text="Pearson分析"
+              subtext="Pearson相关系数是衡量两个变量之间线性相关强度的统计指标。"
               :target_list="target_list"
               :caculate_list="caculate_list"
               :data="pearson_list"
@@ -151,6 +152,7 @@
             ></Heat>
             <Heat
               title_text="Spearman分析"
+              subtext="Spearman相关系数是一种非参数的秩相关度量，用于评估两个变量的单调关系强度。"
               :target_list="target_list"
               :caculate_list="caculate_list"
               :data="spearman_list"
@@ -158,6 +160,7 @@
             ></Heat>
             <Heat
               title_text="Kendall分析"
+              subtext="Kendall相关系数是一种用于衡量两个变量之间序等级相关性的统计方法。"
               :target_list="target_list"
               :caculate_list="caculate_list"
               :data="kendall_list"

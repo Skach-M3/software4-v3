@@ -12,17 +12,21 @@ export default {
       type: String,
       default: "专病集疾病占比",
     },
+    subtext: {
+      type: String,
+      default: "subtitelx",
+    },
     target_list: {
       type: Array,
-      default: () => {},
+      default: () => { },
     },
     caculate_list: {
       type: Array,
-      default: () => {},
+      default: () => { },
     },
     data: {
       type: Array,
-      default: () => {},
+      default: () => { },
     },
     grapgId: {
       type: String,
@@ -52,19 +56,20 @@ export default {
       option = {
         title: {
           text: this.title_text,
-          left: 'center',
-          top:0
+          subtext: this.subtext,
+          left: '0',
+          top: '0'
         },
         tooltip: {
           position: 'top'
         },
         grid: {
-          height: '50%',
-          top: '10%'
+          height: '60%',
+          top: '20%'
         },
         xAxis: {
           type: 'category',
-          
+
           data: this.target_list,
           splitArea: {
             show: true
@@ -83,7 +88,7 @@ export default {
           calculable: true,
           orient: 'horizontal',
           left: 'center',
-          bottom: '15%'
+          bottom: '5%'
         },
         series: [
           {
