@@ -1085,20 +1085,38 @@ export default {
                 }
             })
         },
-        confirmUsenames(type){
-            if (this.multipleSelection.length < 1){ // 自定义状态码
-                    this.$message({
-                        type: "warning",
-                        message: "请选择至少一个用户进行审批",
-                    });                    
-                    return;
-                } 
-            this.multipleLoding=true;
-            this.multipleSelection.forEach(
-                selection => this.updateCheckApprove(selection.username, type)
-            )         
-            this.multipleLoding=false;   
-        },
+        confirmUsenames(type) {
+        if (this.multipleSelection.length < 1) {
+            // 自定义状态码
+            this.$message({
+            type: "warning",
+            message: "请选择至少一个用户进行审批",
+            });
+            return;
+        }
+        this.multipleLoding = true;
+
+        let usernames = [];
+        this.multipleSelection.forEach((selection) =>
+            usernames.push(selection.username)
+        );
+
+        getRequest(`/api/updateCheckApproves`, {
+            id: this.tid,
+            multipleSelection: usernames.join(","),
+            type: type,
+        }).then((res) => {
+            if (res.code == 200) {
+            console.log("res.data:", res.data);
+            this.getCheckDataById(this.tid, this.tname);
+            this.getAllAdminDataTable();
+            } else {
+            this.$message.error("获取用户信息失败");
+            this.getAllAdminDataTable();
+            }
+        });
+        this.multipleLoding = false;
+    },
         toggleSelection(rows) {
             if (rows) {
             rows.forEach(row => {
