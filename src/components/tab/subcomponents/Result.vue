@@ -301,6 +301,11 @@ export default {
           tempLink.source = this.m_caculate_target_feature[0];
           tempLink.target = this.m_result.res[0][i];
           // 权重是随机数
+          if(this.m_result.resWeights!=null){
+            tempLink.value = this.m_result.resWeights[0][i].toFixed(4);
+          }else{
+            tempLink.value = "";
+          }
           // tempLink.value = Number(Math.random().toFixed(3));
           tempLink.lineStyle.width += tempLink.value * 2;
           this.links.push(JSON.parse(JSON.stringify(tempLink)));
@@ -364,6 +369,11 @@ export default {
             }
             tempLink.source = this.m_caculate_target_feature[i];
             tempLink.target = this.m_result.res[i][j];
+            if(this.m_result.resWeights!=null){
+            tempLink.value = this.m_result.resWeights[i][j].toFixed(4);
+          }else{
+            tempLink.value = "";
+          }
             // 权重是随机数
             // tempLink.value = Number(Math.random().toFixed(3));
             tempLink.lineStyle.width = 3 + tempLink.value * 8;
@@ -427,7 +437,11 @@ export default {
             tempLink.source = this.m_caculate_target_feature[i];
             tempLink.target = this.m_result.res[i][j];
             // 权重是随机数
-            tempLink.value = Number(Math.random().toFixed(3));
+            if(this.m_result.resWeights!=null){
+            tempLink.value = this.m_result.resWeights[i][j].toFixed(4);
+          }else{
+            tempLink.value = "";
+          }
             tempLink.lineStyle.width = 3 + tempLink.value * 8;
             this.links.push(JSON.parse(JSON.stringify(tempLink)));
           }

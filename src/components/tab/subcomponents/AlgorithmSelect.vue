@@ -115,15 +115,11 @@
           </div>
           <div class="buttonBox">
             <el-button round @click="backStep()">上一步</el-button>
-            <el-button type="primary" round @click="submit('/runtime_bus/pc')"
+            <el-button type="primary" round @click="submit('/runtime_bus/pc_algorithm')"
               >提交运算</el-button
             >
           </div>
           <div class="paramBox"></div></el-tab-pane>
-        <el-tab-pane label="FP-Growth" :disabled="true">FP-Growth</el-tab-pane>
-        <el-tab-pane label="Logistic Regression" :disabled="true"
-          >Logistic Regression</el-tab-pane
-        >
       </el-tabs>
       <!-- <el-switch v-model="value1">
       </el-switch>
@@ -201,6 +197,7 @@ export default {
           this.m_changeTaskInfo({ algorithm: this.model, result: res.data });
           this.loading = false;
           this.m_changeStep(this.m_step + 1);
+          console.log("rrr"+JSON.stringify(this.m_result));
         })
         .catch((err) => {
           this.loading = false;
@@ -218,7 +215,7 @@ export default {
 
           let parsedData = JSON.parse(jsonString);
           this.m_changeTaskInfo({ traditional_res: parsedData });
-     
+          
         })
         .catch((err) => {
           this.loading = false;

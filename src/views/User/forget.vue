@@ -230,9 +230,9 @@ export default {
       loading: false,
       checked: true,
       active: 1,
-      forgetForm1: [{ username: "" }],
-      forgetForm2: [{ q1: "", q2: "", q3: "" }],
-      forgetForm3: [{ password: "", repsw: "" }],
+      forgetForm1: { username: "" },
+      forgetForm2: { q1: "", q2: "", q3: "" },
+      forgetForm3: { password: "", repsw: "" },
       rules: {
         username: [
           { required: true, message: "请输入用户名", trigger: "blur" },

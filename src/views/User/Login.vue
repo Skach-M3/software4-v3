@@ -1,14 +1,13 @@
 <template>
   <div class="myMain">
     <div class="mainContainer">
-      <div class="leftContainer">
-        <div class="mainRight">
+      <div class="topContainer">
+        <div class="mainRight1">
           <img
             src="http://www.cqupt.edu.cn/dfiles/13011/cqupt/img/favicon_128x128.ico"
             style="height: 100px; width: 100px"
           />
-          <h1>疾病危险因素与多病种关联关系</h1>
-          <h1>挖掘工具软件</h1>
+          <h1>疾病危险因素与多病种关联关系挖掘工具软件</h1>
         </div>
         <div class="mainImg">
           <img
@@ -21,9 +20,61 @@
           />
         </div>
       </div>
-      <div class="rightContainer">
+      <div class="bottomContainer">
+        <div class="notificationDiv">
+          <div class="notification_title">
+            <span style="font-size: 20px; font-weight: bold; margin-top: 20px"
+              >通告栏</span
+            >
+            <div style="display: flex; line-height: 20px; margin-top: 20px">
+              <el-button type="text" @click="moreNotice">
+                <i class="el-icon-zoom-in"></i>更多</el-button
+              >
+            </div>
+          </div>
+          <div class="notification_container">
+            <div v-for="(item, index) in notification" :key="item.infoId">
+              <ul>
+                <li
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: end;
+                    line-height: 15px;
+                    overflow: hidden;
+                    width: 650px;
+                  "
+                
+                >
+                  <span
+                    class="notification_content_title"
+                    @click="showDetails(item)"
+                    :class="{'scroll-on-hover': shouldScroll(item.title)}"
+                  >
+                    <span> {{ item.title }}</span>
+                  </span>
+                  <span style="padding-right: 20px">{{ item.updateTime }}</span>
+                </li>
+              </ul>
+              <el-divider></el-divider>
+            </div>
+          </div>
+        </div>
         <div class="loginContainer">
+          <!-- <div class="banner">
+            <div class="notification_container">
+              <div
+                class="scroll-text"
+                title="点击查看更多通知"
+                @click="moreNotice"
+              >
+                {{ notification }}
+              </div>
+            </div>
+          </div> -->
           <div class="myForm">
+            <!-- </div> -->
+
             <el-form
               element-loading-text="正在登陆..."
               element-loading-spinner="el-icon-loading"
@@ -89,44 +140,6 @@
               > -->
             </el-form>
           </div>
-          <div class="notificationDiv">
-            <div class="notification_title">通告栏</div>
-            <div class="notification_container">
-              <div :class="{ 'animate-scroll': notification.length > 6 }">
-                <div v-for="(item) in notification" :key="item.infoId">
-                  <ul>
-                    <li
-                      style="
-                        display: flex;
-                        justify-content: space-between;
-                        align-items: center;
-                        line-height: 15px;
-                        overflow: hidden;
-                      "
-                    >
-                      <span
-                        class="notification_content_title"
-                        @click="showDetails(item)"
-                      >
-                        <span
-                          class="scroll-text"
-                          :class="{
-                            scrolling: item.title.split('').length > 25,
-                          }"
-                        >
-                          {{ item.title }}</span
-                        >
-                      </span>
-                      <span style="padding-right: 20px">{{
-                        item.createTime
-                      }}</span>
-                    </li>
-                  </ul>
-                  <el-divider></el-divider>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
         <el-dialog
           title="通告详细信息"
@@ -140,6 +153,37 @@
           </div>
           <div class="selectedNotificationContent">
             {{ selectedNotification.content }}
+          </div>
+        </el-dialog>
+        <el-dialog
+          title="通告栏"
+          :visible.sync="dialogVisible2"
+          :modal-append-to-body='false'
+          width="50%"
+          center
+          :close-on-click-modal="true"
+        >
+          <div v-for="(item, index) in notification" :key="item.infoId" >
+            <ul>
+              <li
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  line-height: 15px;
+                  overflow: hidden;
+                "
+              >
+                <span
+                  class="notification_content_title"
+                  @click="showDetails(item)"
+                >
+                  <span> {{ item.title }}</span>
+                </span>
+                <span style="padding-right: 20px">{{ item.updateTime }}</span>
+              </li>
+            </ul>
+            <el-divider></el-divider>
           </div>
         </el-dialog>
       </div>
@@ -198,7 +242,7 @@
 
 <script>
 import { getRequest, postRequest } from "@/utils/api";
-import { setCookie } from "@/components/mixins/mixin";
+import { mapActions } from "vuex";
 export default {
   name: "Login",
 
@@ -219,9 +263,11 @@ export default {
         password: [{ required: true, message: "请输入密码", trigger: "blur" }],
         code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
       },
-      notification: [],
       selectedNotification: {},
       dialogVisible: false,
+      dialogVisible2: false,
+      notificationList: [],
+      notification: "",
     };
   },
   created() {
@@ -231,7 +277,20 @@ export default {
     this.updatecaptcha();
   },
   methods: {
+   shouldScroll(title) {
+      // Check if the title length exceeds 20 characters
+      const tempDiv = document.createElement('div');
+      tempDiv.style.position = 'absolute';
 
+      tempDiv.style.visibility = 'hidden';
+      tempDiv.innerHTML = title;
+      document.body.appendChild(tempDiv);
+      const width = tempDiv.offsetWidth;
+      document.body.removeChild(tempDiv);
+
+      // Check if the width exceeds 180px
+      return width > 300;
+    },
     showDetails(item) {
       this.selectedNotification = item;
       this.dialogVisible = true;
@@ -248,9 +307,9 @@ export default {
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
+        // hour: "2-digit",
+        // minute: "2-digit",
+        // second: "2-digit",
         hour12: false,
         timeZone: "Asia/Shanghai",
       });
@@ -265,10 +324,11 @@ export default {
         if (res) {
           const temp = res.map((item) => ({
             ...item,
-            createTime: this.convertToBeijingTime(item.createTime),
+            updateTime: this.convertToBeijingTime(item.updateTime),
           }));
-          this.notification = temp.reverse();
-       
+
+          this.notification = temp;
+          console.log("notification", this.notification);
         }
       });
     },
@@ -278,7 +338,6 @@ export default {
       done(); // 必须调用 done()，否则对话框不会关闭
     },
     updatecaptcha() {
-     
       this.captchaUrl = `api/common/kaptcha?timestamp=${new Date().getTime()}`;
     },
 
@@ -320,6 +379,9 @@ export default {
         }
       });
     },
+    moreNotice() {
+      this.dialogVisible2 = true;
+    },
     register() {
       this.$router.push("/register");
     },
@@ -338,9 +400,9 @@ export default {
   box-sizing: border-box;
 }
 li {
-  list-style-type: none; /* 去除列表项前的标记 */
-  margin: 0; /* 去除列表项的默认外边距 */
-  padding: 0; /* 去除列表项的默认内边距 */
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
 }
 .myMain {
   width: 100%;
@@ -351,25 +413,49 @@ li {
 .mainContainer {
   display: flex; /* 启用Flex布局 */
   height: 90vh;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
-.leftContainer {
+.topContainer {
   flex: 0.4; /* 左侧盒子的放大比例为1 */
   padding: 20px; /* 内边距 */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: end;
 }
-.rightContainer {
+.bottomContainer {
   flex: 0.6; /* 右侧盒子的放大比例为2 */
   display: flex;
   align-items: center;
   justify-content: center;
   padding-top: 30px;
+  z-index: 2;
+      opacity: 0.9;
+}
+.notificationDiv {
+  border-radius: 15px;
+  background-clip: padding-box;
+  /* margin: 20px 10px; */
+  margin-bottom: 150px;
+  width: 700px;
+  height: 450px;
+  background: white;
+  border: 1px solid #eaeaee;
+  box-shadow: 0 0 25px #cac6c6;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-right: 40px;
 }
 .loginContainer {
   border-radius: 15px;
   background-clip: padding-box;
   /* margin: 20px 10px; */
   margin-bottom: 150px;
-  width: 900px;
-  height: 550px;
+  width: 450px;
+  height: 450px;
   background: white;
   border: 1px solid #eaeaee;
   box-shadow: 0 0 25px #cac6c6;
@@ -377,20 +463,10 @@ li {
   align-items: center;
 }
 .myForm {
-  flex: 0.45;
   padding-left: 30px;
   padding-right: 30px;
 }
-.notificationDiv {
-  flex: 0.55;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  height: 550px;
-  border-left: 1px dashed #aaaaac;
 
-}
 .loginTitle {
   margin: 0px auto 40px auto;
   text-align: center;
@@ -402,33 +478,32 @@ li {
   margin-top: 40px;
 } */
 
-
-.text-photo1 .el-col img{
-  margin-left: 25%;
-}
-
 img.gif {
-  position: absolute;
-  top: 479px;
-  left: 909px;
+
+    position: absolute;
+    top: 565px;
+    left: 1000px;
+    z-index: 0
+
 }
 
 img.png {
   position: absolute;
-  top: 315px;
-  left: 612px;
+  top: 400px;
+  left: 720px;;
+  z-index: 0
 }
 
-.mainRight {
-  position: absolute;
+.mainRight1 {
+  /* position: absolute;
   top: 8px;
-  left: 100px;
+  left: 100px; */
   display: flex;
   align-items: center;
-  flex-direction: column;
+  vertical-align: bottom;
 }
 
-.mainRight h1 {
+.mainRight1 h1 {
   display: block;
   color: white;
   font-size: 40px;
@@ -436,10 +511,8 @@ img.png {
   margin-top: -10px;
 }
 .mainImg {
-  display: block;
-  position: absolute;
-  left: -480px;
-  top: -150px;
+  display: flex;
+  z-index: 1;
 }
 
 .cooperation {
@@ -449,6 +522,13 @@ img.png {
   width: 100%;
   height: 150px;
 }
+.cooperation .text-photo1 .el-col {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
 .cooperation .text-coop {
   margin-left: 20px;
   text-align: left;
@@ -459,6 +539,7 @@ img.png {
 .cooperation img {
   margin-left: 10px;
 }
+
 .loginRemember {
   text-align: left;
   margin: 0px 0px 15px 0px;
@@ -467,19 +548,14 @@ img.png {
   display: flex;
   align-items: center;
 }
-.notification_title {
-  font-size: 30px;
-  font-weight: bold;
-  flex: 0.25;
-  justify-content: center;
-  align-items: center;
-  display: flex;
-}
+
 .notification_container {
-  flex: 0.75;
   width: 100%;
-  height: 450px;
-    overflow: hidden;
+  height: 400px;
+  overflow: hidden;
+  display: flex; /* 使用 Flexbox */
+  align-items: center; /* 垂直居中子元素 */
+  flex-direction: column;
 }
 .collapse {
   overflow: auto;
@@ -491,35 +567,30 @@ img.png {
   white-space: nowrap;
   overflow: hidden;
   cursor: pointer;
-  max-width: 250px;
+  max-width: 400px;
 }
-@keyframes scroll {
+.scroll-on-hover {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.scroll-on-hover:hover {
+  overflow: visible;
+  animation: scroll-text 5s linear infinite;
+}
+
+@keyframes scroll-text {
   0% {
-    transform: translateX(250px);
+    transform: translateX(0);
   }
   100% {
     transform: translateX(-100%);
   }
-  200% {
-    transform: translateX(250px);
-  }
 }
-
-.scroll-text {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  font-weight: 500;
-}
-
-.scrolling {
-  animation: scroll 10s linear infinite;
-}
-
+/* s */
 .notification_content_title:hover .scroll-text {
   animation-play-state: running;
 }
-
 .selectedNotificationTitle {
   font-size: 30px;
   font-weight: bold;
@@ -532,19 +603,20 @@ img.png {
   display: flex;
   justify-content: center;
 }
-.animate-scroll {
-  animation: scroll-up 30s linear infinite;
+.notification_title {
+  height: 50px;
+  width: 100%;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-content: center;
+  padding-left: 20px;
+  padding-right: 20px;
 }
-
-@keyframes scroll-up {
-  0% {
-    transform: translateY(0%);
-  }
-  100% {
-    transform: translateY(-100%);
-  }
-    150% {
-    transform: translateY(0%);
-  }
+.el-divider--horizontal {
+  display: block;
+  height: 1px;
+  width: 100%;
+  margin: 18px 0;
 }
 </style>

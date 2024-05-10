@@ -6,8 +6,12 @@
         <span class="statistic"> 一级病种: {{ diseaseNum }} 个 </span>
         <span class="statistic"> 数据表: {{ datasetNum }} 个 </span>
       </div>
-      <el-button style="width: 100%;" @click="uploadDataDialogVisible = true; getDataDiseases()"> <i
+      <div class = "tree_btn"  style="display: flex; justify-content: space-between;">
+        <el-button style="width: 50%;" @click="uploadDataDialogVisible = true; getDataDiseases()"> <i
           class="el-icon-circle-plus-outline"></i> 上传数据 </el-button>
+          <el-button style="width: 50%;margin-left:0" @click="filterDataDialogVisible = true; getDataDiseases();openFileterAddDataForm()"> <i
+          class="el-icon-circle-plus-outline"></i> 纳排数据 </el-button>
+      </div>
       <hr class="hr-dashed" />
       <el-input placeholder="输入关键字进行过滤" v-model="filterText">
       </el-input>
@@ -33,7 +37,7 @@
             <span>
               <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集"
                 title="请选择添加数据集方式" cancel-button-type="primary" @confirm="importData"
-                @cancel="openAddDataForm(data.label)">
+                @cancel="openAddDataForm()">
                 <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
                   icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
@@ -77,7 +81,7 @@
             <span>
               <el-popconfirm v-if="data.label != '多疾病'" confirm-button-text="上传数据集" cancel-button-text="纳排数据集"
                 title="请选择添加数据集方式" cancel-button-type="primary" @confirm="importData"
-                @cancel="openAddDataForm(data.label)">
+                @cancel="openAddDataForm()">
                 <el-button v-if="data.catLevel != 1 && data.status != 2 && data.isLeafs == 0"
                   icon="el-icon-circle-plus-outline" size="mini" type="text" slot="reference" @click="markNode(data)">
                 </el-button>
@@ -170,7 +174,10 @@
       </div>
       <div class="addDataClass" style="margin-top: 20px">
         <div class="addDataTitle">
-          <i class="el-icon-connection"></i>&nbsp;&nbsp;特征选择
+          <div><i class="el-icon-connection"></i>&nbsp;&nbsp;特征选择</div>
+          <el-button type="primary" plain @click="getSelectItems"
+            >查看历史筛选条件</el-button
+          >
         </div>
         <div style="margin-top: 20px">
           <el-button type="primary" plain icon="el-icon-plus" style="margin-right: 8px"
@@ -256,7 +263,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="cleanDataInput()">取 消</el-button>
-        <el-button type="primary" @click="addTable()">新建表</el-button>
+        <el-button v-if="is_after_filterd == true" type="primary" @click="addTable()">新建表</el-button>
       </span>
       <el-dialog title="特征选择" :visible.sync="characterVisible" width="50%" append-to-body>
         <el-container>
@@ -342,7 +349,77 @@
         </div>
       </el-dialog>
     </el-dialog>
-
+    <el-dialog title="筛选历史记录" :visible.sync="dialogSelectItemsVisible">
+      <el-table :data="filterConditionsData" height="500">
+        <el-table-column
+          property="time"
+          label="筛选日期"
+          width="150"
+        ></el-table-column>
+        <el-table-column
+          property="user"
+          label="筛选人"
+          width="150"
+        ></el-table-column>
+        <template v-for="n in maxConditions">
+          <el-table-column
+            v-if="n > 1"
+            :key="`opt${n}`"
+            :label="`关系${n}`"
+            width="100"
+          >
+            <template v-slot="scope">
+              <span>{{
+                scope.row.filterCondition[n - 1]
+                  ? scope.row.filterCondition[n - 1].showOpt
+                  : ""
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :key="`chName${n}`" :label="`特征${n}`" width="100">
+            <template v-slot="scope">
+              <span>{{
+                scope.row.filterCondition[n - 1]
+                  ? scope.row.filterCondition[n - 1].chName
+                  : ""
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column
+            :key="`computeOpt${n}`"
+            :label="`条件${n}`"
+            width="100"
+          >
+            <template v-slot="scope">
+              <span>{{
+                scope.row.filterCondition[n - 1]
+                  ? scope.row.filterCondition[n - 1].computeOpt
+                  : ""
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column :key="`value${n}`" :label="`取值${n}`" width="100">
+            <template v-slot="scope">
+              <span>{{
+                scope.row.filterCondition[n - 1]
+                  ? scope.row.filterCondition[n - 1].value
+                  : ""
+              }}</span>
+            </template>
+          </el-table-column>
+        </template>
+        <el-table-column fixed="right" label="操作" width="100">
+          <template slot-scope="scope">
+            <el-button
+              @click="handleFilterClick(scope.row)"
+              type="text"
+              size="small"
+              >应用</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
     <!--===============================     添加数据表单   ===================================================================-->
     <el-dialog v-loading="loading" :element-loading-text="loadText" id="importDataTable" title="导入数据表"
       :visible.sync="uploadDataDialogVisible" width="40%">
@@ -394,6 +471,167 @@
         <div slot="footer" class="dialog-footer">
           <el-button type="primary" @click="compelete">完成上传</el-button>
         </div>
+      </el-dialog>
+    </el-dialog>
+
+    <!--===============================      纳排数据按钮 表单   ===================================================================-->
+    <el-dialog title="新增纳排数据集" :visible.sync="filterDataDialogVisible" width="1150px">
+      <div class="addDataClass">
+        <div class="addDataBaseInfo">
+          <i class="el-icon-s-data"></i>
+          <span class="titleText">数据集：</span>
+          <el-input v-model="addDataForm.dataName" placeholder="请输入数据集名称"></el-input>
+        </div>
+        <div class="addDataBaseInfo">
+          <i class="el-icon-user-solid"></i>
+          <span class="titleText">创建人：</span>
+          <el-input v-model="addDataForm.createUser" placeholder="请输入创建人姓名" disabled></el-input>
+        </div>
+        <div class="addDataBaseInfo createTimeArea">
+          <i class="el-icon-time"></i>
+          <span class="titleText">创建时间：</span>
+          <span>{{ showFeatureDataForm.createTime }}</span>
+        </div>
+        <div class="addDataBaseInfo">
+          <!-- <i class="el-icon-pie-chart"></i>
+          <span class="titleText">所属类别：</span>
+          <span class="belongType">{{ showFeatureDataForm.classPath }}</span> -->
+        </div>
+      </div>
+
+      <div class="addDataClass" style="margin-top: 1%;">
+        <div class="block">
+          <span class="demonstration">请选择疾病：</span>
+          <el-cascader :options="disOptions" :props="{ checkStrictly: true }" v-model="selectedOptions"
+              @change="handleCascaderChange"></el-cascader>
+              <span class="demonstration" style="margin-left: 2%;">是否共享：</span>
+              <el-switch v-model="is_share" active-color="#13ce66" inactive-color="#ff4949" @change="is_share_change()" style="margin-left: 1%;"></el-switch>
+            <span v-if="is_share" style="margin-left: 1%;">共享用户名单：{{ share_username }}</span>
+        </div>
+      </div>
+
+      <div class="addDataClass" style="margin-top: 20px">
+        <div class="addDataTitle">
+          <i class="el-icon-connection"></i>&nbsp;&nbsp;特征选择
+          <el-button type="primary" plain @click="getSelectItems"
+            >查看历史筛选条件</el-button
+          >
+        </div>
+        <div style="margin-top: 20px">
+          <el-button type="primary" plain icon="el-icon-plus" style="margin-right: 8px"
+            @click="putToAddDataForm">添加新条件</el-button>
+          <el-button @click="chooseCharacter(addDataForm.characterList[0])"
+            style="margin-right: 8px; margin-left: 0px">{{ addDataForm.characterList[0].button }}</el-button>
+          <span v-if="addDataForm.characterList[0].type === 'discrete'">
+            <el-select :value="'='" slot="prepend" placeholder="运算符" style="width: 90px; margin-right: 8px" disabled>
+              <el-option label="=" value="="></el-option>
+            </el-select>
+            <el-select v-model="addDataForm.characterList[0].value" placeholder="请选择特征取值" style="width: 300px">
+              <el-option v-for="item in addDataForm.characterList[0].range" :key="item" :label="item" :value="item">
+              </el-option>
+            </el-select>
+          </span>
+          <span v-else>
+            <el-select v-model="addDataForm.characterList[0].computeOpt" slot="prepend" placeholder="运算符"
+              style="width: 90px; margin-right: 8px">
+              <el-option label=">" value=">"></el-option>
+              <el-option label="<" value="<"></el-option>
+              <el-option label="=" value="="></el-option>
+            </el-select>
+            <el-input v-model="addDataForm.characterList[0].value" placeholder="请输入特征取值"
+              style="width: 300px"></el-input>
+            <span style="width: 200px; color: #858585">
+              单位：{{ addDataForm.characterList[0].unit }}</span>
+          </span>
+        </div>
+        <div style="margin-top: 20px" v-for="(characterItem, index) in addDataForm.characterList.slice(1)" :key="index">
+          <el-select v-model="characterItem.opt" slot="prepend" placeholder="条件选择"
+            style="width: 130px; margin-right: 8px">
+            <el-option label="AND" value="0"></el-option>
+            <el-option label="OR" value="1"></el-option>
+            <el-option label="NOT" value="2"></el-option>
+          </el-select>
+          <el-button @click="chooseCharacter(characterItem)" style="width: 130px; margin-right: 8px">{{
+          characterItem.button }}</el-button>
+          <span v-if="characterItem.type === 'discrete'">
+            <el-select :value="'='" slot="prepend" placeholder="运算符" style="width: 90px; margin-right: 8px" disabled>
+              <el-option label="=" value="="></el-option>
+            </el-select>
+            <el-select v-model="characterItem.value" placeholder="请选择特征取值" style="width: 300px">
+              <el-option v-for="item in characterItem.range" :key="item" :label="item" :value="item">
+              </el-option>
+            </el-select>
+          </span>
+          <span v-else>
+            <el-select v-model="characterItem.computeOpt" slot="prepend" placeholder="运算符"
+              style="width: 90px; margin-right: 8px">
+              <el-option label=">" value=">"></el-option>
+              <el-option label="<" value="<"></el-option>
+              <el-option label="=" value="="></el-option>
+            </el-select>
+            <el-input v-model="characterItem.value" placeholder="请输入特征取值" style="width: 300px"></el-input>
+            <span style="width: 200px; color: #858585">
+              单位：{{ characterItem.unit }}</span>
+          </span>
+          <el-button type="primary" plain icon="el-icon-delete" style="margin-left: 10px"
+            @click="deleteToAddDataForm(characterItem)">删除</el-button>
+        </div>
+        <div style="
+            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+          ">
+          <button class="cool-button" @click="submitCharacterConditionWithNodeId();is_after_filterd=true;">
+            筛选病例
+          </button>
+        </div>
+        <!-- 显示筛选出来的表数据 -->
+        <el-table :data="addTableData" stripe style="width: 100%" height="500" v-show="showAddTableData"
+          :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
+          element-loading-text="正在抽取数据">
+          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
+            sortable>
+            <template slot-scope="{ row }">
+              <div class="truncate-text">{{ row[key] }}</div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="cleanDataInput()">取 消</el-button>
+        <el-button v-if="is_after_filterd == true" type="primary" @click="addUserFilterTable()">新建表</el-button>
+      </span>
+      <el-dialog title="特征选择" :visible.sync="characterVisible" width="50%" append-to-body>
+        <el-container>
+          <el-aside width="180px">
+            <el-menu default-active="1" class="el-menu-vertical-demo">
+              <el-menu-item index="1" @click="exchangeCharacterList(0)">
+                <span slot="title">人口学</span>
+              </el-menu-item>
+              <el-menu-item index="3" @click="exchangeCharacterList(2)">
+                <span slot="title">生理指标</span>
+              </el-menu-item>
+              <el-menu-item index="4" @click="exchangeCharacterList(3)">
+                <span slot="title">行为学</span>
+              </el-menu-item>
+            </el-menu>
+          </el-aside>
+          <el-main>
+            <el-radio-group v-model="characterId" class="charactersGroup">
+              <el-radio v-for="optItem in characterOptList" :key="optItem.characterId" :label="optItem.characterId"
+                border style="
+                  margin-bottom: 10px;
+                  margin-left: 0px;
+                  margin-right: 10px;
+                ">{{ optItem.chName }}</el-radio>
+            </el-radio-group>
+          </el-main>
+        </el-container>
+        <span slot="footer" class="dialog-footer">
+          <el-button type="primary" @click="confirmCharacter()">确 定</el-button>
+        </span>
       </el-dialog>
     </el-dialog>
 
@@ -556,6 +794,11 @@ export default {
     // 获取列表长度
     length() {
       return this.tableData.length || 0;
+    },
+    maxConditions() {
+      return this.filterConditionsData.reduce((max, item) => {
+        return Math.max(max, item.filterCondition.length);
+      }, 0);
     },
   },
   mounted() {
@@ -733,6 +976,21 @@ export default {
       //允许下载
       nodeid: "",
       downloadStatus: "0",
+      // 新增纳排按钮
+      filterDataDialogVisible:false,
+      dialogSelectItemsVisible: false,
+      filterConditionsData: [],
+      optMap: {
+        0: "AND",
+        1: "OR",
+        2: "NOT",
+      },
+      optValueMap: {
+        "AND":0,
+        "OR": 1,
+        "NOT": 2,
+      },
+      is_after_filterd:false
     };
   },
 
@@ -939,7 +1197,7 @@ export default {
           oldObj.range = a.range;
           oldObj.button = a.chName;
           oldObj.value = "";
-          oldObj.opt = a.opt;
+          // oldObj.opt = a.opt;
         }
       }
       this.addDataForm.characterList[index] = oldObj;
@@ -1375,16 +1633,23 @@ export default {
     },
     cleanDataInput() {
       this.dialogDataVisible = false;
+      this.share_uid_list = [];
+        this.share_username = '';
+        this.uid_list = '';
+        this.filterDataDialogVisible = false;
+        this.selectedOptions = [];
+        this.is_after_filterd = false;
+        this.is_share=false;
     },
     addTable() {
       // 创建表
       this.addDataForm.uid_list = this.uid_list,
-        this.diseaseName = this.addDataForm.dataName;
+      this.diseaseName = this.addDataForm.dataName;
       this.dialogDataVisible = false;
       let filterConditions = {};
       filterConditions.addDataForm = this.addDataForm;
       filterConditions.nodeData = this.nodeData;
-      console.log(filterConditions);
+
       this.options = {
         method: "post",
         data: filterConditions,
@@ -1396,17 +1661,65 @@ export default {
           "role": sessionStorage.getItem("userrole")
         },
       };
+
       this.$axios(this.options).then((res) => {
         this.getCatgory();
         this.share_uid_list = [];
         this.share_username = '';
         this.uid_list = '';
       });
+      this.is_after_filterd = false;
+    },
+    addUserFilterTable(){
+      // 创建表
+      this.addDataForm.uid_list = this.uid_list,
+      this.diseaseName = this.addDataForm.dataName;
+      this.dialogDataVisible = false;
+      let filterConditions = {};
+      const tempData=this.addDataForm.characterList.map((item)=>{
+        return{
+          ...item,
+          opt:isNaN(item.opt)?this.optValueMap[item.opt]:item.opt
+        }
+      });
+      const tempAddDataForm={...this.addDataForm,characterList:tempData}
+      filterConditions.addDataForm = tempAddDataForm
+
+      filterConditions.nodeid = this.selectedOptions[this.selectedOptions.length - 1];
+      if(this.is_share == true){
+        filterConditions.status = "1";
+      }else{
+        filterConditions.status = "0";
+      }
+      this.options = {
+        method: "post",
+        data: filterConditions,
+        url: "api/createFilterBtnTable",
+        headers: {
+          "Content-Type": "application/json",
+          "uid": this.loginUserID,
+          "username": sessionStorage.getItem("username"),
+          "role": sessionStorage.getItem("userrole")
+        },
+      };
+
+      this.$axios(this.options).then((res) => {
+        this.getCatgory();
+        this.share_uid_list = [];
+        this.share_username = '';
+        this.uid_list = '';
+        this.filterDataDialogVisible = false;
+        this.selectedOptions = [];
+        this.is_after_filterd = false;
+        this.is_share=false;
+      });
+
+
     },
     putToAddDataForm() {
       let number = -Math.floor(Math.random() * 100);
       let item = {
-        opt: "",
+        opt: "0",
         characterId: -1,
         featureName: "",
         chName: "",
@@ -1437,7 +1750,14 @@ export default {
       this.showAddTableData = true;
       this.addDataLoading = true;
       let filterConditions = {};
-      filterConditions.addDataForm = this.addDataForm;
+      const tempData=this.addDataForm.characterList.map((item)=>{
+        return{
+          ...item,
+          opt:isNaN(item.opt)?this.optValueMap[item.opt]:item.opt
+        }
+      });
+      const tempAddDataForm={...this.addDataForm,characterList:tempData}
+      filterConditions.addDataForm = tempAddDataForm
       filterConditions.nodeData = this.nodeData;
       this.options = {
         method: "post",
@@ -1451,6 +1771,12 @@ export default {
       this.$axios(this.options)
         .then((res) => {
           this.addTableData = res.data;
+          if(this.addTableData.length==0){
+            this.is_after_filterd = false;
+          }
+          else{
+            this.is_after_filterd = true;
+          }
           // console.log("数据:");
           // console.log(this.addTableData);
           // this.showAddTableData = true;
@@ -1462,9 +1788,55 @@ export default {
           this.addDataLoading = false;
         });
       let s = JSON.stringify(this.addDataForm.characterList, null, 2);
-      console.log("this.addDataForm:");
-      console.log(this.addDataForm);
-      console.log(s);
+    },
+    submitCharacterConditionWithNodeId() {
+      // console.log("this.addDataForm.characterList");
+      // console.log(this.addDataForm.characterList);
+      console.log(this.selectedOptions);
+      this.showAddTableData = true;
+      this.addDataLoading = true;
+      let filterConditions = {};
+      const tempData=this.addDataForm.characterList.map((item)=>{
+        return{
+          ...item,
+          opt:isNaN(item.opt)?this.optValueMap[item.opt]:item.opt
+        }
+      });
+      const tempAddDataForm={...this.addDataForm,characterList:tempData}
+      filterConditions.addDataForm = tempAddDataForm
+      filterConditions.nodeData = this.nodeData;
+      filterConditions.nodeid = this.selectedOptions[this.selectedOptions.length-1];
+      console.log(filterConditions);
+      console.log(filterConditions.nodeid);
+      this.options = {
+        method: "post",
+        data: filterConditions,
+        url: "api/getFilterDataByConditionsByDieaseId",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      // console.log("请求参数：" + JSON.stringify(filterConditions));
+      this.$axios(this.options)
+        .then((res) => {
+          this.addTableData = res.data;
+          if(this.addTableData.length==0){
+            this.is_after_filterd = false;
+          }
+          else{
+            this.is_after_filterd = true;
+          }
+          // console.log("数据:");
+          // console.log(this.addTableData);
+          // this.showAddTableData = true;
+          this.addDataLoading = false;
+        })
+        .catch((error) => {
+          this.$message.error("获取数据失败");
+          console.log("获取数据失败" + error);
+          this.addDataLoading = false;
+        });
+      let s = JSON.stringify(this.addDataForm.characterList, null, 2);
     },
     getNowDateFormat() {
       const currentDate = new Date();
@@ -1473,7 +1845,35 @@ export default {
       const day = String(currentDate.getDate()).padStart(2, "0");
       return `${year}-${month}-${day}`;
     },
-    openAddDataForm(type) {
+    openFileterAddDataForm() {
+      this.addDataForm = {
+        dataName: "",
+        uid: sessionStorage.getItem("userid"),
+        username: sessionStorage.getItem("username"),
+        createUser: sessionStorage.getItem("username"),
+        isUpload: "0",
+        isFilter: "1",
+        uid_list: this.uid_list,
+        characterList: [
+          {
+            opt: "",
+            characterId: -1,
+            featureName: "",
+            chName: "",
+            type: "",
+            unit: "",
+            range: "",
+            button: "点击选择特征",
+            value: "",
+            computeOpt: "",
+          },
+        ],
+      };
+      this.showAddTableData = false;
+      this.showFeatureDataForm.createUse = sessionStorage.getItem("username");
+      this.showFeatureDataForm.createTime = this.getNowDateFormat();
+    },
+    openAddDataForm() {
       this.addDataForm = {
         dataName: "",
         uid: sessionStorage.getItem("userid"),
@@ -1501,7 +1901,6 @@ export default {
       this.showAddTableData = false;
       this.showFeatureDataForm.createUse = sessionStorage.getItem("username");
       this.showFeatureDataForm.createTime = this.getNowDateFormat();
-      this.showFeatureDataForm.classPath = type;
     },
     exchangeCharacterList(index) {
       getFetures("/api/feature/getFeatures", index)
@@ -1612,14 +2011,14 @@ export default {
         uid_list: this.uid_list,
       }).then((res) => {
         if (res.code == 200) {
-          this.$message.success("分享成功");
+          this.$message.success("共享成功");
           this.TableshareUserSelectDialog = false;
           this.TableshareUserChangeDialog = false;
           this.share_uid_list = [];
           this.uid_list = '';
           this.getCatgory();
         } else {
-          this.$message.error("分享失败");
+          this.$message.error("共享失败");
         }
       });
 
@@ -1688,11 +2087,9 @@ export default {
       })
         .then((res) => {
           if (res.code == 200) {
-            this.$message.success("转为私有成功");
+
             this.share_uid_list = res.data;
-          } else {
-            this.$message.error("转为私有失败");
-          }
+          } 
         }).catch((error) => {
           console.log(error);
         });
@@ -1804,6 +2201,40 @@ export default {
           // console.log(res.data);
         }
       });
+    },
+    //历史纳排记录
+    getSelectItems() {
+      console.log("in");
+      getRequest("/api/getFilterConditionInfos").then((res) => {
+        this.dialogSelectItemsVisible = true;
+        var reg = /^"|"$|'|'/g;
+        const filterTableData = res.data.map((item) => {
+          return {
+            filterCondition: item.filterDataCols.map((item) => {
+              return {
+                ...item,
+                button: item.chName,
+                showOpt: this.optMap[item.opt],
+                value: item.value.replace(reg, ""),
+              };
+            }),
+            user: item.filterDataInfo.username,
+            time: item.filterDataInfo.filterTime,
+          };
+        });
+        this.filterConditionsData = filterTableData;
+      });
+      console.log("filterConditionsData", this.filterConditionsData);
+    },
+    handleFilterClick(row) {
+      const tempColumn = row.filterCondition.map((item) => {
+        return {
+          ...item,
+          opt: item.showOpt,
+        };
+      });
+      this.addDataForm.characterList = tempColumn;
+      this.dialogSelectItemsVisible = false;
     },
   },
 
