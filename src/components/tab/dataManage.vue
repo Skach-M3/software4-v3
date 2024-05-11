@@ -254,7 +254,7 @@
         <el-table :data="addTableData" stripe style="width: 100%" max-height="500" v-show="showAddTableData"
           :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
           element-loading-text="正在抽取数据">
-          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
+          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" 
             sortable>
             <template slot-scope="{ row }">
               <div class="truncate-text">{{ row[key] }}</div>
@@ -592,7 +592,7 @@
         <el-table :data="addTableData" stripe style="width: 100%" max-height="500" v-show="showAddTableData"
           :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
           element-loading-text="正在抽取数据">
-          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
+          <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key"
             sortable>
             <template slot-scope="{ row }">
               <div class="truncate-text">{{ row[key] }}</div>
@@ -693,7 +693,7 @@
             <el-table v-if="tableData.length > 0" :data="tableData" stripe style="width: 100%" class="custom-table"
               max-height="720" ref="scrollTable" :header-cell-style="{ background: '#eee', color: '#606266' }">
               <el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key"
-                :width="colWidth" sortable>
+                 sortable>
                 <template slot-scope="{ row }">
                   <div class="truncate-text">{{ row[key] }}</div>
                 </template>
@@ -781,14 +781,14 @@ export default {
     loginUserID() {
       return sessionStorage.getItem("userid");
     },
-    colWidth() {
-      let arr = Object.keys(this.tableData[0]);
-      if (arr.length <= 15) {
-        return 90;
-      } else {
-        return 65;
-      }
-    },
+    // colWidth() {
+    //   let arr = Object.keys(this.tableData[0]);
+    //   if (arr.length <= 15) {
+    //     return 90;
+    //   } else {
+    //     return 65;
+    //   }
+    // },
     // 获取展示的列表
     showList() {
       return this.tableData.slice(this.start, this.end);

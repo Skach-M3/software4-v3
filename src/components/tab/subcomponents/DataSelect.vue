@@ -95,11 +95,11 @@
               请在左侧选择数据
             </div>
             <div v-else ref="list">
-              <el-table :data="tableData" stripe class="custom-table" max-height="550" :fit="false"
+              <el-table :data="tableData" stripe class="custom-table" max-height="550"
                 v-if="tableData.length > 0" :header-cell-style="{ background: '#eee', color: '#606266' }"
                 ref="scrollTable">
                 <el-table-column v-for="(value, key) in tableData[0]" :key="key" :prop="key" :label="key"
-                  :width="colWidth" sortable>
+                  sortable>
                   <template slot-scope="{ row }">
                     <div class="truncate-text">{{ row[key] }}</div>
                   </template>
@@ -151,14 +151,6 @@ export default {
     },
   },
   computed: {
-    colWidth() {
-      let arr = Object.keys(this.tableData[0]);
-      if (arr.length <= 15) {
-        return 90;
-      } else {
-        return 65;
-      }
-    },
     length() {
       return this.tableData.length || 0;
     },
