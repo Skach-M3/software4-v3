@@ -169,8 +169,10 @@
           <span class="titleText">所属类别：</span>
           <span class="belongType">{{ showFeatureDataForm.classPath }}</span> -->
         </div>
-        <span v-if="nodeData.status == '1'">共享用户名单：{{ share_username }}</span>
-        <el-button v-if="nodeData.status == '1'" @click="shareUserSelectDialog = true">选择共享用户</el-button>
+        <div class="addDataBaseInfo">
+          <span v-if="nodeData.status == '1'">共享用户名单：{{ share_username }}</span>
+          <el-button v-if="nodeData.status == '1'" @click="shareUserSelectDialog = true">选择共享用户</el-button>
+        </div>
       </div>
       <div class="addDataClass" style="margin-top: 20px">
         <div class="addDataTitle">
@@ -249,7 +251,7 @@
           </button>
         </div>
         <!-- 显示筛选出来的表数据 -->
-        <el-table :data="addTableData" stripe style="width: 100%" height="500" v-show="showAddTableData"
+        <el-table :data="addTableData" stripe style="width: 100%" max-height="500" v-show="showAddTableData"
           :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
           element-loading-text="正在抽取数据">
           <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
@@ -263,7 +265,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="cleanDataInput()">取 消</el-button>
-        <el-button v-if="is_after_filterd == true" type="primary" @click="addTable()">新建表</el-button>
+        <el-button v-if="is_after_filterd == true && addDataForm.dataName!== ''" type="primary" @click="addTable()">新建表</el-button>
       </span>
       <el-dialog title="特征选择" :visible.sync="characterVisible" width="50%" append-to-body>
         <el-container>
@@ -582,12 +584,12 @@
             display: flex;
             justify-content: center;
           ">
-          <button class="cool-button" @click="submitCharacterConditionWithNodeId();is_after_filterd=true;">
+          <button class="cool-button" @click="submitCharacterConditionWithNodeId();">
             筛选病例
           </button>
         </div>
         <!-- 显示筛选出来的表数据 -->
-        <el-table :data="addTableData" stripe style="width: 100%" height="500" v-show="showAddTableData"
+        <el-table :data="addTableData" stripe style="width: 100%" max-height="500" v-show="showAddTableData"
           :header-cell-style="{ background: '#eee', color: '#606266' }" v-loading="addDataLoading"
           element-loading-text="正在抽取数据">
           <el-table-column v-for="(value, key) in addTableData[0]" :key="key" :prop="key" :label="key" width="80"
@@ -601,7 +603,7 @@
 
       <span slot="footer" class="dialog-footer">
         <el-button @click="cleanDataInput()">取 消</el-button>
-        <el-button v-if="is_after_filterd == true" type="primary" @click="addUserFilterTable()">新建表</el-button>
+        <el-button v-if="is_after_filterd == true && addDataForm.dataName!== ''" type="primary" @click="addUserFilterTable()">新建表</el-button>
       </span>
       <el-dialog title="特征选择" :visible.sync="characterVisible" width="50%" append-to-body>
         <el-container>
@@ -736,8 +738,8 @@
       <!-- 单独表进行共享用户对话框 -->
       <el-dialog title="请选择要共享的用户" :visible.sync="TableshareUserSelectDialog" width="40%">
         <div style="text-align: center">
-          <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
-            filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
+          <el-transfer style="text-align: left; display: inline-block;" v-model="share_uid_list" filterable
+            filter-placeholder="请输入用户名称" :titles="['未共享用户', '已共享用户']" :filter-method="filterMethod"
             :data="all_uid_list">
             <el-button class="transfer-footer" slot="left-footer" size="small" @click="cancelShare()">取消</el-button>
             <el-button class="transfer-footer" slot="right-footer" size="small" @click="compeleteShare()">完成</el-button>
@@ -749,7 +751,7 @@
       <el-dialog title="请进行共享用户更改" :visible.sync="TableshareUserChangeDialog" width="40%">
         <div style="text-align: center">
           <el-transfer style="text-align: left; display: inline-block" v-model="share_uid_list" filterable
-            filter-placeholder="请输入用户名称" :titles="['未共享用户', '以共享用户']" :filter-method="filterMethod"
+            filter-placeholder="请输入用户名称" :titles="['未共享用户', '已共享用户']" :filter-method="filterMethod"
             :data="all_uid_list">
             <el-button class="transfer-footer" slot="left-footer" size="small" @click="cancelShare()">取消</el-button>
             <el-button class="transfer-footer" slot="right-footer" size="small" @click="compeleteShare()">完成</el-button>
@@ -1671,6 +1673,7 @@ export default {
       this.is_after_filterd = false;
     },
     addUserFilterTable(){
+  
       // 创建表
       this.addDataForm.uid_list = this.uid_list,
       this.diseaseName = this.addDataForm.dataName;
@@ -1787,9 +1790,11 @@ export default {
           console.log("获取数据失败" + error);
           this.addDataLoading = false;
         });
-      let s = JSON.stringify(this.addDataForm.characterList, null, 2);
     },
     submitCharacterConditionWithNodeId() {
+      if(this.selectedOptions.length === 0){
+        return this.$message.warning("请先选择疾病！")
+      }
       // console.log("this.addDataForm.characterList");
       // console.log(this.addDataForm.characterList);
       console.log(this.selectedOptions);
@@ -1836,7 +1841,6 @@ export default {
           console.log("获取数据失败" + error);
           this.addDataLoading = false;
         });
-      let s = JSON.stringify(this.addDataForm.characterList, null, 2);
     },
     getNowDateFormat() {
       const currentDate = new Date();
@@ -2334,11 +2338,11 @@ h3 {
   width: 18%;
   border-radius: 3px;
   border: 1px solid #e6e6e6;
-  overflow: auto;
+  /* overflow: auto; */
 }
 
 .treeArea {
-  height: calc(820px - 93px);
+  height: calc(820px - 135px);
   /* 93px是头部信息和按钮的高度 */
   overflow: auto;
 }

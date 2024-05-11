@@ -32,7 +32,7 @@
                 </el-table-column>
                 <el-table-column prop="tableName" label="数据表名称" width="150">
                 </el-table-column>
-                <el-table-column prop="createUser" label="用户名称" width="150">
+                <el-table-column prop="createUser" label="用户名称" width="100">
                 </el-table-column>
                 <el-table-column prop="classPath" label="所属类别" width="300">
                     <!-- <template slot-scope="scope">
@@ -40,7 +40,7 @@
                       <el-tag v-if="scope.row.role == '1'">普通用户</el-tag>
                   </template> -->
                 </el-table-column>
-                <el-table-column prop="createTime" label="创建时间" width="150">
+                <el-table-column prop="createTime" label="创建时间" width="100">
                 </el-table-column>
                 <el-table-column label="数据表状态" width="100">
                     <template slot-scope="props">
@@ -55,7 +55,7 @@
                 </el-table-column>
                 <el-table-column prop="checkApproved" label="已批准下载用户" width="150">
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column label="操作" width="200" fixed="right">
                     <template slot-scope="scope">
                         <el-button type="primary" icon="el-icon-edit" circle
                             @click="getDataDiseases(); getEditDataById(scope.row.id, scope.row.tableName, scope.row.tableStatus)"></el-button>
@@ -260,41 +260,39 @@
        </el-dialog>
 
        <el-dialog title="数据表预览" :visible.sync="selectTableVisible">
-           <div>
-           <div class="table-container-after">
-               <!---------------------------------- 骨架屏 --------------------------------->
-               <el-skeleton
-               v-if="selectTableLoading"
-               style="width: 100%"
-               :rows="30"
-               animated
-               />
+            <div class="table-container-after">
+                <!---------------------------------- 骨架屏 --------------------------------->
+                <el-skeleton
+                v-if="selectTableLoading"
+                style="width: 100%"
+                :rows="15"
+                animated
+                />
 
-               <el-table
-               v-else
-               :data="tableData"
-               stripe
-               class="custom-table"
-               :header-cell-style="headerCellStyle"
-               ref="scrollTable"
-               height="700vh"
-               >
-               <el-table-column
-                   v-for="(value, key) in tableData[0]"
-                   :key="key"
-                   :prop="key"
-                   :label="key"
-                   width="auto"
-                   :show-overflow-tooltip="true"
-                   :sortable="true"
-               >
-                   <template slot-scope="{ row }">
-                   <div class="truncate-text">{{ row[key] }}</div>
-                   </template>
-               </el-table-column>
-               </el-table>
-           </div>
-           </div>
+                <el-table
+                v-else
+                :data="tableData"
+                stripe
+                class="custom-table"
+                :header-cell-style="headerCellStyle"
+                ref="scrollTable"
+                max-height="600px"
+                >
+                <el-table-column
+                    v-for="(value, key) in tableData[0]"
+                    :key="key"
+                    :prop="key"
+                    :label="key"
+                    width="auto"
+                    :show-overflow-tooltip="true"
+                    :sortable="true"
+                >
+                    <template slot-scope="{ row }">
+                    <div class="truncate-text">{{ row[key] }}</div>
+                    </template>
+                </el-table-column>
+                </el-table>
+            </div>
        </el-dialog>
 
 

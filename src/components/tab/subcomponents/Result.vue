@@ -244,13 +244,13 @@ export default {
     }
     for (let i = 0; i < this.target_list.length; i++) {
       for(let j=0; j< this.caculate_list.length;j++){
-        var temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Kendall"]]
+        let temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Kendall"]]
         this.pearson_list.push(temp_arry)
       }  
     }
     for (let i = 0; i < this.target_list.length; i++) {
       for(let j=0; j< this.caculate_list.length;j++){
-        var temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Spearman"]]
+        let temp_arry = [i,j,Correlation_Results[this.target_list[i]][this.caculate_list[j]]["Spearman"]]
         this.kendall_list.push(temp_arry)
       }  
     }
@@ -545,7 +545,6 @@ export default {
           console.log(err);
           this.m_changeStep(this.m_step - 1);
           return false;
-          this.$router.push("/taskManage");
         })
         .catch((err) => {
           this.$message({
@@ -695,7 +694,7 @@ h3 {
 
 .graphBox2{
   display: grid;
-  grid-template-columns: repeat(3,540px);
+  grid-template-columns: repeat(3,1fr);
   justify-content: space-evenly;
 }
 

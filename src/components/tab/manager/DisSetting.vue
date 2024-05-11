@@ -66,14 +66,13 @@
         <!-- 新增多疾病设置 -->
         <el-table-column label="操作（注释：删除上级病种时会将该病种下所有病种删除！）">
           <template slot-scope="scope">
-                        <el-button
-                            icon="el-icon-folder-add"
-                            type="primary"
-                            circle
-                            style="margin-left: 60%;"
-                            @click="setAddDisease(scope.row)"
-                            v-if="scope.row.label!=='多疾病'&& scope.row.id!=='14'"
-                        ></el-button>
+            <el-button
+                icon="el-icon-folder-add"
+                type="primary"
+                circle
+                @click="setAddDisease(scope.row)"
+                v-if="scope.row.label!=='多疾病'&& scope.row.id!=='14'"
+            ></el-button>
             <el-button type="primary" icon="el-icon-edit" circle @click="getInfoDisease(scope.row)" v-if="scope.row.label!=='多疾病' && scope.row.id!=='14'"></el-button>
             <el-popconfirm confirm-button-text='确定' cancel-button-text='取消' icon="el-icon-info"
                            icon-color="red" title="确定删除该病种吗？" @confirm="deleteDisease(scope.row)">
@@ -345,6 +344,7 @@ export default {
     getInfoDisease(row){
       this.editDialogDiseaseVisible = true
       console.log(row)
+      this.test = '';
       if(row.parentId!=="1"){
         // for(var i=0;i<this.tableData.length;i++){
         //   for(var j=0;j<this.tableData[i].children.length;j++){
