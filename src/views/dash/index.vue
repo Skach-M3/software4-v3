@@ -280,6 +280,7 @@ export default {
             data: new Array(7).fill(0),
           });
         }
+        console.log(this.taskModel);
         for (let i = 0; i < 7; i++) {
           this.sevendays.push(res[i].formattedDate);
           this.taskTotal[0].data.push(res[i].total);

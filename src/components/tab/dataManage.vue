@@ -147,7 +147,7 @@
         </span>
       </el-dialog>
     </div>
-    <el-dialog title="新增数据集" :visible.sync="dialogDataVisible" width="1150px">
+    <el-dialog title="新增数据集" :visible.sync="dialogDataVisible" width="1150px" >
       <div class="addDataClass">
         <div class="addDataBaseInfo">
           <i class="el-icon-s-data"></i>
@@ -298,7 +298,7 @@
     </el-dialog>
     <!--===============================     导入数据表单   ===================================================================-->
     <el-dialog v-loading="loading" :element-loading-text="loadText" id="importDataTable" title="导入数据表"
-      :visible.sync="dialogFormVisible" width="40%">
+      :visible.sync="dialogFormVisible" width="40%" :before-close="DataSetOpthandleClose">
       <el-form :model="dialogForm" ref="dialogFormRef" :rules="dialogForm.rules" label-width="110px">
         <el-form-item label="选择数据表" prop="filesInfo">
           <el-upload action="" class="upload" ref="uploadRef" :on-preview="handlePreview" :on-remove="handleRemove"
@@ -422,7 +422,7 @@
     </el-dialog>
     <!--===============================     添加数据表单   ===================================================================-->
     <el-dialog v-loading="loading" :element-loading-text="loadText" id="importDataTable" title="导入数据表"
-      :visible.sync="uploadDataDialogVisible" width="40%">
+      :visible.sync="uploadDataDialogVisible" width="40%" :before-close="DataSetOpthandleClose">
       <el-form :model="dialogForm" ref="dialogFormRef" :rules="dialogForm.rules" label-width="110px">
         <el-form-item label="选择数据表" prop="filesInfo">
           <el-upload action="" class="upload" ref="userUploadRef" :on-preview="handlePreview" :on-remove="handleRemove"
@@ -475,7 +475,7 @@
     </el-dialog>
 
     <!--===============================      纳排数据按钮 表单   ===================================================================-->
-    <el-dialog title="新增纳排数据集" :visible.sync="filterDataDialogVisible" width="1150px">
+    <el-dialog title="新增纳排数据集" :visible.sync="filterDataDialogVisible" width="1150px" :before-close="DataSetOpthandleClose">
       <div class="addDataClass">
         <div class="addDataBaseInfo">
           <i class="el-icon-s-data"></i>
@@ -2236,6 +2236,16 @@ export default {
       this.addDataForm.characterList = tempColumn;
       this.dialogSelectItemsVisible = false;
     },
+    DataSetOpthandleClose(){
+      this.dialogForm.tableName = "";
+      this.dialogForm.filesInfo = [];
+      this.dialogFormVisible = false;
+
+      this.selectedOptions = [];
+      this.uploadDataDialogVisible = false;
+      this.filterDataDialogVisible = false;
+      console.log(this.selectedOptions);
+    }
   },
 
 };
