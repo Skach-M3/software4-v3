@@ -1,5 +1,3 @@
-import { method } from "lodash";
-
 export const tabSwitch = {
     data() {
         return {
@@ -50,4 +48,26 @@ export const setCookie = {
       }
     }
   }
+}
+
+export function deepClone (obj){
+  const cache = new WeakMap();
+
+  function _deepClone(obj){
+    if(obj == null|| typeof obj !== "object"){
+      return obj;
+    }
+    if(cache.has(obj)){
+      return cache.get(obj);
+    }
+    const result = Array.isArray(obj) ? []:{};
+    cache.set(obj,result);
+    for (const key in obj) {
+      if (Object.hasOwnProperty.call(obj, key)) {
+        result[key] = _deepClone(obj[key]);
+      }
+    }
+    return result;
+  }
+  return _deepClone(obj);
 }

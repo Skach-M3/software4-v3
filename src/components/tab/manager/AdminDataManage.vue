@@ -301,15 +301,12 @@
 
 <script>
 import { getRequest, postRequest } from "@/api/user";
-import { resetForm, debounce } from "@/components/mixins/mixin";
-import { getTableDes, getTableData } from "@/api/tableDescribe.js";
+import { resetForm, debounce, deepClone } from "@/components/mixins/mixin";
+import { getTableData } from "@/api/tableDescribe.js";
 export default {
     mixins: [resetForm, debounce],
 
     watch: {
-        "dialogForm.tableName"() {
-            this.checkTableName();
-        },
         "dialogForm.tableName"() {
             this.checkTableName();
         },
@@ -318,8 +315,9 @@ export default {
         displayedAdminDataManageList() {
             const startIndex = (this.params.page - 1) * this.params.size;
             const endIndex = startIndex + this.params.size;
-            // 首先对数据进行排序
-            const sortedList = this.adminDataManageList.sort((a, b) => {
+            // 首先对数据进行排序,不修改原始数据
+            const adminDataManageList_temp = deepClone(this.adminDataManageList);
+            const sortedList = adminDataManageList_temp.sort((a, b) => {
                 // 假设 scope.row.checkApproving 是 a.checkApproving
                 const checkApprovingA = this.checkInfos(a.checkApproving);
                 const checkApprovingB = this.checkInfos(b.checkApproving);
