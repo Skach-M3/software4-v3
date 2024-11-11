@@ -1665,12 +1665,13 @@ export default {
       };
 
       this.$axios(this.options).then((res) => {
-        this.getCatgory();
-        this.share_uid_list = [];
-        this.share_username = '';
-        this.uid_list = '';
+        console.log(res);
+        // this.getCatgory();
+        // this.share_uid_list = [];
+        // this.share_username = '';
+        // this.uid_list = '';
       });
-      this.is_after_filterd = false;
+      // this.is_after_filterd = false;
     },
     addUserFilterTable(){
   

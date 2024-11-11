@@ -45,7 +45,8 @@ const routes = [
   {
     path: '/forget',
     name: 'forget',
-    component: forget
+    component: forget,
+    meta: { roles: ['1', '0'] }, 
   },
   {
      path: "/sideBar",
@@ -161,7 +162,7 @@ const routes = [
         path: "/inform",
         name: "inform",
         component: inform,
-        meta: { roles: ['0'] },
+        meta: { roles: ['0','1'] },
       },
     ],
   },

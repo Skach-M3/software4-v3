@@ -92,7 +92,7 @@
               </el-menu-item>
               <el-menu-item index="/AdminDataManage">
                 <i class="el-icon-s-data"></i>
-                <span slot="title">系统数据管理</span>
+                <span slot="title">数据集管理</span>
               </el-menu-item>
               <el-menu-item index="/LogManage">
                 <i class="el-icon-message-solid"></i>
