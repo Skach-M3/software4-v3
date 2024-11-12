@@ -118,6 +118,22 @@
           </div>
           <div class="paramBox"></div></el-tab-pane>
 
+          <el-tab-pane label="GS" name="GS">          
+          <div class="titleBox">GS</div>
+          <div class="introBox">
+            <p>模型说明：</p>
+            <p>
+              GS算法是一种基于马尔科夫边界的因果特征选择算法，旨在通过条件独立性测试识别出与目标变量直接相关的最小特征集合。
+            </p>
+          </div>
+          <div class="buttonBox">
+            <el-button round @click="backStep()">上一步</el-button>
+            <el-button type="primary" round @click="submit('/runtime_bus/gs_algorithm')"
+              >提交运算</el-button
+            >
+          </div>
+          <div class="paramBox"></div></el-tab-pane>
+
           <el-tab-pane
           label="MIFS"
           name="MIFS"
@@ -155,9 +171,6 @@
             </el-form>
             <div class="buttonBox">
               <el-button round @click="backStep()">上一步</el-button>
-              <el-button round @click="resetForm('SF_DRMB_ref')"
-                >恢复默认</el-button
-              >
               <el-button
                 type="primary"
                 round
@@ -167,6 +180,7 @@
             </div>
           </div>
         </el-tab-pane>
+
       </el-tabs>
       
       
