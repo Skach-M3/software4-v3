@@ -4,7 +4,7 @@ import router from '../router'
 
 const server = axios.create({
   // 过期时间
-  timeout: 20000,
+  timeout: 600000,
   headers: {
     'Content-Type': 'application/json;charset=UTF-8',
   },

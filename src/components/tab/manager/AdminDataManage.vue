@@ -756,6 +756,7 @@ export default {
                 payload.append("tableStatus", "2");
                 payload.append("tableSize", fileSizeInMB);
                 payload.append("current_uid", sessionStorage.getItem("userid"));
+                payload.append("uid_list", "");
 
                 this.options = {
                     method: "post",
@@ -1045,10 +1046,10 @@ export default {
                 id: id
             }).then(res => {
                 if (res.code == 501){ // 自定义状态码
-                    this.$message({
-                        type: "warning",
-                        message: "该数据集现在没有用户申请下载",
-                    });
+                    // this.$message({
+                    //     type: "warning",
+                    //     message: "该数据集现在没有用户申请下载",
+                    // });
                     this.checkAdminDataManageVisible = false;
                     return;
                 }
